@@ -50,3 +50,8 @@ next-env.d.ts
 /actions/seed.js
 
 /app/api/seed/route.js
+
+# Development log files
+DEVELOPMENT_LOG.md
+
+TROUBLESHOOTING.md

@@ -37,11 +37,13 @@ export async function getCurrentBudget(accountId) {
     const expenses = await db.transaction.aggregate({
       where: {
         userId: user.id,
-        createdAt: {
+        type: "EXPENSE", // Only count expense transactions
+        date: {
+          // Use actual transaction date, not createdAt
           gte: startOfMonth,
           lte: endOfMonth,
         },
-        accountId,
+        ...(accountId && { accountId }), // Filter by account if provided
       },
       _sum: {
         amount: true,

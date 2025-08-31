@@ -23,10 +23,17 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
     initialBudget?.amount?.toString() || ""
   );
 
-  // Using initialBudget.amount since initialBudget is an object
-  const percentageUsed = initialBudget?.amount
-    ? ((currentExpenses / initialBudget.amount) * 100).toFixed(2)
-    : 0;
+  // Calculate percentage with proper error handling and bounds checking
+  const percentageUsed = React.useMemo(() => {
+    if (!initialBudget?.amount || initialBudget.amount <= 0) {
+      return 0;
+    }
+    const percentage = (currentExpenses / initialBudget.amount) * 100;
+    // Ensure percentage is within valid bounds
+    return Math.min(Math.max(percentage, 0), 100);
+  }, [initialBudget?.amount, currentExpenses]);
+
+  const formattedPercentage = percentageUsed.toFixed(1);
 
   const {
     loading: isLoading,
@@ -134,12 +141,12 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
                 percentageUsed >= 90
                   ? "bg-primary/20 [&>div]:bg-red-500"
                   : percentageUsed >= 75
-                  ? "bg-primary/20 [&>div]:bg-yellow-500"
-                  : "bg-primary/20 [&>div]:bg-green-500"
+                    ? "bg-primary/20 [&>div]:bg-yellow-500"
+                    : "bg-primary/20 [&>div]:bg-green-500"
               }
             />
             <p className="text-sm text-muted-foreground text-right">
-              {percentageUsed}% Used
+              {formattedPercentage}% Used
             </p>
           </div>
         )}
