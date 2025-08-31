@@ -43,7 +43,7 @@ const Header = async () => {
                   </Button>
                 </Link>
 
-                <Link href="/transactions/create">
+                <Link href="/transaction/create">
                   <Button size="sm" className="rounded-md h-9">
                     <PenBox size={16} className="mr-2" />
                     <span>New Transaction</span>
@@ -99,7 +99,7 @@ const Header = async () => {
                   Dashboard
                 </Link>
                 <Link
-                  href="/transactions/create"
+                  href="/transaction/create"
                   className="flex items-center px-2 py-3 text-base font-medium hover:bg-muted rounded-md"
                 >
                   <PenBox size={18} className="mr-3" />
