@@ -84,24 +84,27 @@ export function CreateAccountDrawer({ children }) {
             <div className="space-y-2">
               <label
                 htmlFor="name"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 tracking-tight"
               >
                 Account Name
               </label>
               <Input
                 id="name"
                 placeholder="e.g., Main Checking"
+                className="h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200 bg-background/50"
                 {...register("name")}
               />
               {errors.name && (
-                <p className="text-sm text-red-500">{errors.name.message}</p>
+                <p className="text-sm text-destructive font-medium">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="type"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 tracking-tight"
               >
                 Account Type
               </label>
@@ -109,23 +112,28 @@ export function CreateAccountDrawer({ children }) {
                 onValueChange={(value) => setValue("type", value)}
                 defaultValue={watch("type")}
               >
-                <SelectTrigger id="type">
+                <SelectTrigger
+                  id="type"
+                  className="h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200 bg-background/50"
+                >
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="border shadow-md">
                   <SelectItem value="CURRENT">Current</SelectItem>
                   <SelectItem value="SAVINGS">Savings</SelectItem>
                 </SelectContent>
               </Select>
               {errors.type && (
-                <p className="text-sm text-red-500">{errors.type.message}</p>
+                <p className="text-sm text-destructive font-medium">
+                  {errors.type.message}
+                </p>
               )}
             </div>
 
             <div className="space-y-2">
               <label
                 htmlFor="balance"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 tracking-tight"
               >
                 Initial Balance
               </label>
@@ -134,22 +142,25 @@ export function CreateAccountDrawer({ children }) {
                 type="number"
                 step="0.01"
                 placeholder="0.00"
+                className="h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200 bg-background/50"
                 {...register("balance")}
               />
               {errors.balance && (
-                <p className="text-sm text-red-500">{errors.balance.message}</p>
+                <p className="text-sm text-destructive font-medium">
+                  {errors.balance.message}
+                </p>
               )}
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border p-3">
+            <div className="flex items-center justify-between rounded-lg border border-border/60 bg-background/30 p-3 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200">
               <div className="space-y-0.5">
                 <label
                   htmlFor="isDefault"
-                  className="text-base font-medium cursor-pointer"
+                  className="text-base font-medium cursor-pointer tracking-tight text-foreground/90"
                 >
                   Set as Default
                 </label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground/80">
                   This account will be selected by default for transactions
                 </p>
               </div>
@@ -160,15 +171,19 @@ export function CreateAccountDrawer({ children }) {
               />
             </div>
 
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-4 border-t border-border/30">
               <DrawerClose asChild>
-                <Button type="button" variant="outline" className="flex-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200"
+                >
                   Cancel
                 </Button>
               </DrawerClose>
               <Button
                 type="submit"
-                className="flex-1"
+                className="flex-1 h-11 shadow-sm hover:shadow-md transition-all duration-200"
                 disabled={createAccountLoading}
               >
                 {createAccountLoading ? (

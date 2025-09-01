@@ -23,7 +23,7 @@ import useFetch from "@/hooks/use-fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ca } from "date-fns/locale";
-import { CalendarRangeIcon, Receipt } from "lucide-react";
+import { CalendarRangeIcon, Receipt, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -367,15 +367,74 @@ const AddTransactionForm = ({ accounts, categories }) => {
                 variant="outline"
                 className="flex-1 h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200"
                 onClick={() => router.back()}
+                disabled={transactionLoading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="flex-1 h-11 shadow-sm hover:shadow-md transition-all duration-200"
+                className="flex-1 h-11 shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden"
                 disabled={transactionLoading}
               >
-                {transactionLoading ? "Creating..." : "Create Transaction"}
+                {transactionLoading ? (
+                  <div className="flex items-center justify-center w-full h-full relative">
+                    {/* Animated background gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/40 via-primary/70 to-primary/40 animate-pulse rounded-md" />
+
+                    {/* Main content container */}
+                    <div className="relative z-10 flex items-center space-x-3">
+                      {/* Spinning loader with enhanced styling */}
+                      <div className="relative">
+                        <Loader2 className="h-4 w-4 animate-spin text-white drop-shadow-sm" />
+                        {/* Glow effect behind the spinner */}
+                        <div className="absolute inset-0 h-4 w-4 bg-white/30 rounded-full blur-[2px] animate-pulse" />
+                      </div>
+
+                      {/* Text with animated dots */}
+                      <div className="flex items-center space-x-1">
+                        <span className="text-white font-medium text-sm drop-shadow-sm">
+                          Creating Transaction
+                        </span>
+                        <div className="flex space-x-0.5 ml-1">
+                          <div
+                            className="w-1 h-1 bg-white/90 rounded-full animate-bounce"
+                            style={{
+                              animationDelay: "0ms",
+                              animationDuration: "1s",
+                            }}
+                          />
+                          <div
+                            className="w-1 h-1 bg-white/90 rounded-full animate-bounce"
+                            style={{
+                              animationDelay: "200ms",
+                              animationDuration: "1s",
+                            }}
+                          />
+                          <div
+                            className="w-1 h-1 bg-white/90 rounded-full animate-bounce"
+                            style={{
+                              animationDelay: "400ms",
+                              animationDuration: "1s",
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Shimmer overlay effect */}
+                    <div
+                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 animate-shimmer rounded-md"
+                      style={{
+                        animation: "shimmer 2s infinite",
+                        transform: "translateX(-100%) skewX(12deg)",
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <span className="relative z-10 font-medium">
+                    Create Transaction
+                  </span>
+                )}
               </Button>
             </div>
           </form>

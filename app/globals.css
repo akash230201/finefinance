@@ -186,20 +186,14 @@
 
   .bg-grid {
     background-size: 40px 40px;
-    background-image: linear-gradient(
-        to right,
-        rgba(209, 213, 219, 0.1) 1px,
-        transparent 1px
-      ),
+    background-image:
+      linear-gradient(to right, rgba(209, 213, 219, 0.1) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(209, 213, 219, 0.1) 1px, transparent 1px);
   }
 
   .dark .bg-grid {
-    background-image: linear-gradient(
-        to right,
-        rgba(44, 47, 51, 0.3) 1px,
-        transparent 1px
-      ),
+    background-image:
+      linear-gradient(to right, rgba(44, 47, 51, 0.3) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(44, 47, 51, 0.3) 1px, transparent 1px);
   }
 
@@ -224,7 +218,8 @@
   transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   will-change: transform;
   border-radius: var(--radius-lg);
-  box-shadow: 0 5px 20px -5px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 5px 20px -5px rgba(0, 0, 0, 0.1),
     0 30px 60px -10px rgba(0, 0, 0, 0.1);
 }
 
@@ -234,7 +229,8 @@
 
 .hero-image:hover {
   transform: rotateX(5deg) rotateY(-5deg) scale(1);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15),
+  box-shadow:
+    0 10px 30px -5px rgba(0, 0, 0, 0.15),
     0 30px 60px -10px rgba(0, 0, 0, 0.15);
 }
 
@@ -247,7 +243,8 @@
 
 .feature-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
@@ -281,7 +278,8 @@
 
 .testimonial-card:hover {
   transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
@@ -348,4 +346,59 @@
 .bg-gradient-animate {
   background-size: 200% 200%;
   animation: gradient-shift 8s ease infinite;
+}
+
+/* Beautiful transaction loader animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Inline keyframe animation for shimmer effect */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Enhanced pulse animation for loader background */
+@keyframes loader-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-loader-pulse {
+  animation: loader-pulse 2s ease-in-out infinite;
+}
+
+/* Smooth fade-in animation for loading state */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out forwards;
 }

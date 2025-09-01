@@ -49,10 +49,10 @@ const AccountCard = ({ account }) => {
   }, [error]);
 
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200 ease-in-out group relative">
+    <Card className="hover:shadow-lg transition-all duration-300 ease-in-out group relative border-border/60 hover:border-border/80">
       <Link href={`/accounts/${id}`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium capitalize">
+          <CardTitle className="text-sm font-medium capitalize tracking-tight">
             {name}
           </CardTitle>
           <Switch
@@ -62,20 +62,20 @@ const AccountCard = ({ account }) => {
           />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className="text-2xl font-bold tracking-tight text-foreground/90">
             ${parseFloat(balance).toFixed(2)}
           </div>
-          <p className="text-xs text-muted-foreground mb-2">
+          <p className="text-xs text-muted-foreground/80 mb-2 tracking-wide">
             {type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()} Account
           </p>
         </CardContent>
-        <CardFooter className="flex justify-between text-xs text-muted-foreground">
-          <div className="flex items-center">
-            <ArrowUpRight className="mr-1 h-4 w-4 text-green-500" />
+        <CardFooter className="flex justify-between text-xs text-muted-foreground/70">
+          <div className="flex items-center transition-colors duration-200 hover:text-green-600">
+            <ArrowUpRight className="mr-1 h-4 w-4 text-green-500 transition-transform duration-200 group-hover:scale-110" />
             Income
           </div>
-          <div className="flex items-center">
-            <ArrowDownRight className="mr-1 h-4 w-4 text-red-500" />
+          <div className="flex items-center transition-colors duration-200 hover:text-red-600">
+            <ArrowDownRight className="mr-1 h-4 w-4 text-red-500 transition-transform duration-200 group-hover:scale-110" />
             Expenses
           </div>
         </CardFooter>
