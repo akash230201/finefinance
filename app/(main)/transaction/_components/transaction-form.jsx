@@ -71,10 +71,15 @@ const AddTransactionForm = ({ accounts, categories }) => {
   };
 
   useEffect(() => {
-    if (transactionResult?.success && !transactionLoading) {
-      toast.success("Transaction created successfully.");
-      reset();
-      router.push(`/accounts/${transactionResult.data.accountId}`);
+    if (transactionResult && !transactionLoading) {
+      if (transactionResult.success) {
+        toast.success("Transaction created successfully.");
+        reset();
+        router.push(`/accounts/${transactionResult.data.accountId}`);
+      } else if (transactionResult.error) {
+        // Handle error responses (defensive programming)
+        toast.error(transactionResult.error);
+      }
     }
   }, [transactionResult, transactionLoading]);
 
