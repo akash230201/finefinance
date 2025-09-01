@@ -1,6 +1,6 @@
 "use client";
 
-import { createTransaction } from "@/actions/transaction";
+import { createTransaction, updateTransaction } from "@/actions/transaction";
 import { transactionSchema } from "@/app/lib/schema";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { Button } from "@/components/ui/button";
@@ -24,14 +24,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ca } from "date-fns/locale";
 import { CalendarRangeIcon, Receipt, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { use, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { ReceiptScanner } from "./recipt-scanner";
 
-const AddTransactionForm = ({ accounts, categories }) => {
+const AddTransactionForm = ({
+  accounts,
+  categories,
+  editMode = false,
+  initialData = null,
+}) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
+
+  // Determine if we're in edit mode based on editId or editMode prop
+  const isEditMode = editMode || !!editId;
   const {
     register,
     setValue,
@@ -46,7 +56,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
       type: "EXPENSE",
       amount: "",
       description: "",
-      date: format(new Date(), "yyyy-MM-dd"),
+      date: new Date(),
       accountId: accounts?.find((ac) => ac.isDefault)?.id || "",
       category: "",
       isRecurring: false,
@@ -57,24 +67,35 @@ const AddTransactionForm = ({ accounts, categories }) => {
     loading: transactionLoading,
     fn: transactionFn,
     data: transactionResult,
-  } = useFetch(createTransaction);
+  } = useFetch(isEditMode ? updateTransaction : createTransaction);
 
   const type = watch("type");
   const isRecurring = watch("isRecurring");
   const date = watch("date");
+  const recurringInterval = watch("recurringInterval");
+  const accountId = watch("accountId");
+  const category = watch("category");
 
   const onSubmit = async (data) => {
     const formData = {
       ...data,
       amount: parseFloat(data.amount),
     };
-    await transactionFn(formData);
+    if (isEditMode) {
+      transactionFn(editId, formData);
+    } else {
+      await transactionFn(formData);
+    }
   };
 
   useEffect(() => {
     if (transactionResult && !transactionLoading) {
       if (transactionResult.success) {
-        toast.success("Transaction created successfully.");
+        toast.success(
+          isEditMode
+            ? "Transaction updated successfully."
+            : "Transaction created successfully."
+        );
         reset();
         router.push(`/accounts/${transactionResult.data.accountId}`);
       } else if (transactionResult.error) {
@@ -82,7 +103,34 @@ const AddTransactionForm = ({ accounts, categories }) => {
         toast.error(transactionResult.error);
       }
     }
-  }, [transactionResult, transactionLoading]);
+  }, [transactionResult, transactionLoading, isEditMode, reset, router]);
+
+  // Populate form when in edit mode and initialData is available
+  useEffect(() => {
+    if (isEditMode && initialData) {
+      // Only populate if we're in edit mode AND have initial data
+      setValue("type", initialData.type);
+      setValue("amount", initialData.amount.toString());
+      setValue("description", initialData.description || "");
+      setValue("accountId", initialData.accountId);
+      setValue("category", initialData.category);
+      setValue("date", new Date(initialData.date));
+      setValue("isRecurring", initialData.isRecurring);
+      if (initialData.recurringInterval) {
+        setValue("recurringInterval", initialData.recurringInterval);
+      }
+    } else if (!isEditMode) {
+      // Reset to clean default values when NOT in edit mode
+      setValue("type", "EXPENSE");
+      setValue("amount", "");
+      setValue("description", "");
+      setValue("accountId", accounts?.find((ac) => ac.isDefault)?.id || "");
+      setValue("category", "");
+      setValue("date", new Date());
+      setValue("isRecurring", false);
+      setValue("recurringInterval", "");
+    }
+  }, [isEditMode, initialData, setValue, accounts]);
 
   const filteredCategories = categories.filter(
     (category) => category.type === type
@@ -108,7 +156,11 @@ const AddTransactionForm = ({ accounts, categories }) => {
       <div className="bg-card border border-border/40 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
         <div className="p-6 space-y-6">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            <ReceiptScanner onScanComplete={handleScanComplete} />
+            {/* Receipt Scanner - Only show in create mode */}
+            {!isEditMode && (
+              <ReceiptScanner onScanComplete={handleScanComplete} />
+            )}
+
             {/* Transaction Type Section */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
@@ -123,7 +175,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
                   </label>
                   <Select
                     onValueChange={(value) => setValue("type", value)}
-                    defaultValue={watch("type")}
+                    value={type}
                   >
                     <SelectTrigger className="h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200 bg-background/50">
                       <SelectValue placeholder="Select transaction type" />
@@ -174,7 +226,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
                   </label>
                   <Select
                     onValueChange={(value) => setValue("accountId", value)}
-                    defaultValue={getValues("accountId")}
+                    value={accountId}
                   >
                     <SelectTrigger className="h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200 bg-background/50">
                       <SelectValue placeholder="Choose account" />
@@ -213,7 +265,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
                   </label>
                   <Select
                     onValueChange={(value) => setValue("category", value)}
-                    defaultValue={getValues("category")}
+                    value={category}
                   >
                     <SelectTrigger className="h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200 bg-background/50">
                       <SelectValue placeholder="Select category" />
@@ -338,7 +390,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
                       onValueChange={(value) =>
                         setValue("recurringInterval", value)
                       }
-                      defaultValue={getValues("recurringInterval")}
+                      value={recurringInterval}
                     >
                       <SelectTrigger className="h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200 bg-background/50">
                         <SelectValue placeholder="How often should this repeat?" />
@@ -393,7 +445,9 @@ const AddTransactionForm = ({ accounts, categories }) => {
                       {/* Text with animated dots */}
                       <div className="flex items-center space-x-1">
                         <span className="text-white font-medium text-sm drop-shadow-sm">
-                          Creating Transaction
+                          {isEditMode
+                            ? "Updating Transaction"
+                            : "Creating Transaction"}
                         </span>
                         <div className="flex space-x-0.5 ml-1">
                           <div
@@ -432,7 +486,7 @@ const AddTransactionForm = ({ accounts, categories }) => {
                   </div>
                 ) : (
                   <span className="relative z-10 font-medium">
-                    Create Transaction
+                    {isEditMode ? "Update Transaction" : "Create Transaction"}
                   </span>
                 )}
               </Button>
