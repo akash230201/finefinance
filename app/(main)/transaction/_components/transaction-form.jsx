@@ -23,11 +23,12 @@ import useFetch from "@/hooks/use-fetch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { ca } from "date-fns/locale";
-import { CalendarRangeIcon } from "lucide-react";
+import { CalendarRangeIcon, Receipt } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { ReceiptScanner } from "./recipt-scanner";
 
 const AddTransactionForm = ({ accounts, categories }) => {
   const router = useRouter();
@@ -87,12 +88,27 @@ const AddTransactionForm = ({ accounts, categories }) => {
     (category) => category.type === type
   );
 
+  const handleScanComplete = (scannedData) => {
+    if (scannedData) {
+      setValue("amount", scannedData.amount.toString());
+      setValue("date", new Date(scannedData.date));
+      if (scannedData.description) {
+        setValue("description", scannedData.description);
+      }
+      if (scannedData.category) {
+        setValue("category", scannedData.category);
+      }
+      toast.success("Receipt scanned successfully");
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto space-y-8">
       {/* Main Form Card */}
       <div className="bg-card border border-border/40 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
         <div className="p-6 space-y-6">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            <ReceiptScanner onScanComplete={handleScanComplete} />
             {/* Transaction Type Section */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
