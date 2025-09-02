@@ -47,13 +47,173 @@ next-env.d.ts
 
 /.vscode/
 
+# Development seed files
 /actions/seed.js
-
+/actions/seed.ts
 /app/api/seed/route.js
+/app/api/seed/route.ts
+seed.js
+seed.ts
+**/seed.js
+**/seed.ts
 
-# Development log files
+# Development API routes
+/app/api/test/
+/app/api/dev/
+
+# Development files and documentation
 DEVELOPMENT_LOG.md
-
 TROUBLESHOOTING.md
+NAVIGATION_IMPLEMENTATION.md
+MULTI_CURRENCY_IMPLEMENTATION.md
+CURRENCY_STATUS.md
+PRODUCTION_READY_CHANGES.md
 
-NAVIGATION_IMPLEMENTATION.md 
+# Development scripts and utilities
+fix-prisma.bat
+*.bat
+*.sh
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# Prisma generated files
+/lib/generated/prisma
+prisma/generated/
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel deployment
+.vercel
+
+# Temporary folders
+tmp/
+temp/
+
+# Production build artifacts
+/dist/
+/build/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional REPL history
+.node_repl_history
+
+# Lock files (keep package-lock.json but ignore others)
+yarn.lock
+pnpm-lock.yaml
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Test coverage
+test-results/
+playwright-report/
+coverage/
+
+# Storybook build outputs
+storybook-static/
+
+# Security and sensitive files
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Cache directories
+.cache/
+.eslintcache
+.stylelintcache
+
+# Editor workspace files
+*.code-workspace
+
+# Local development database
+/dev.db
+/test.db 

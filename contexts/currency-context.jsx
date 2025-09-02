@@ -34,26 +34,27 @@ export function CurrencyProvider({ children }) {
   useEffect(() => {
     async function loadCurrencyPreference() {
       try {
+        // Always start with localStorage for now due to database schema issue
+        const savedCurrency = localStorage.getItem("preferred-currency");
+        if (savedCurrency && SUPPORTED_CURRENCIES[savedCurrency]) {
+          setCurrentCurrency(savedCurrency);
+        }
+
+        // For authenticated users, attempt to load from database (but don't fail if it doesn't work)
         if (isSignedIn && userId) {
-          // For authenticated users, load from database
-          const result = await getUserCurrency();
-          if (result.success && result.currency) {
-            setCurrentCurrency(result.currency);
-            localStorage.setItem("preferred-currency", result.currency);
-          } else {
-            // Fallback to localStorage if database fails
-            const savedCurrency = localStorage.getItem("preferred-currency");
-            if (savedCurrency && SUPPORTED_CURRENCIES[savedCurrency]) {
-              setCurrentCurrency(savedCurrency);
-              // Sync to database in background
-              updateUserCurrency(savedCurrency).catch(console.error);
+          try {
+            const result = await getUserCurrency();
+            if (result.success && result.currency && !result.useLocalStorage) {
+              // Only update if database actually returned a preference
+              setCurrentCurrency(result.currency);
+              localStorage.setItem("preferred-currency", result.currency);
             }
-          }
-        } else {
-          // For unauthenticated users, use localStorage only
-          const savedCurrency = localStorage.getItem("preferred-currency");
-          if (savedCurrency && SUPPORTED_CURRENCIES[savedCurrency]) {
-            setCurrentCurrency(savedCurrency);
+          } catch (dbError) {
+            console.warn(
+              "Database currency fetch failed, using localStorage:",
+              dbError
+            );
+            // Continue with localStorage value
           }
         }
       } catch (error) {
@@ -107,12 +108,20 @@ export function CurrencyProvider({ children }) {
       setCurrentCurrency(newCurrency);
       localStorage.setItem("preferred-currency", newCurrency);
 
-      // Save to database if user is authenticated
+      // Try to save to database if user is authenticated (but don't fail if it doesn't work)
       if (isSignedIn && userId) {
-        const result = await updateUserCurrency(newCurrency);
-        if (!result.success) {
-          console.error("Failed to save currency to database:", result.error);
-          // Don't show error to user as localStorage still works
+        try {
+          const result = await updateUserCurrency(newCurrency);
+          if (!result.success) {
+            console.warn(
+              "Database currency save failed, using localStorage:",
+              result.error
+            );
+            // Continue - localStorage save still works
+          }
+        } catch (dbError) {
+          console.warn("Database currency save error:", dbError);
+          // Continue - localStorage save still works
         }
       }
 
