@@ -217,4 +217,190 @@ storybook-static/
 
 # Local development database
 /dev.db
-/test.db 
+/test.db
+
+# Production readiness - additional exclusions
+# Temporary and swap files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.tmpfiles
+
+# Editor and IDE specific files
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+.atom/
+.brackets.json
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Package manager files
+yarn.lock
+pnpm-lock.yaml
+.yarn/
+.pnp/
+.pnp.js
+
+# Environment and configuration files
+.env*
+!.env.example
+.clerk/
+config.local.js
+config.local.json
+
+# Development and testing files
+cypress/videos/
+cypress/screenshots/
+test-results/
+playwright-report/
+coverage/
+.nyc_output/
+.jest/
+.coverage/
+
+# Build and deployment artifacts
+.next/
+.turbo/
+out/
+dist/
+build/
+.vercel/
+.netlify/
+.firebase/
+
+# Database and migration files
+*.db
+*.sqlite
+*.sqlite3
+data.db
+/prisma/dev.db
+/prisma/migrations/migration_lock.toml
+
+# Logs and debugging
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+debug.log
+error.log
+
+# Cache directories
+.cache/
+.eslintcache
+.stylelintcache
+.parcel-cache/
+.next/cache/
+node_modules/.cache/
+
+# Runtime and process files
+*.pid
+*.seed
+*.pid.lock
+.node_repl_history
+
+# Documentation and development notes (comment out if you want to keep them)
+DEVELOPMENT_LOG.md
+TROUBLESHOOTING.md
+NAVIGATION_IMPLEMENTATION.md
+MULTI_CURRENCY_IMPLEMENTATION.md
+CURRENCY_STATUS.md
+PRODUCTION_READY_CHANGES.md
+TRANSACTION_CREATION_FIX.md
+TODO.md
+NOTES.md
+docs/development/
+docs/internal/
+
+# Development scripts and utilities
+fix-prisma.bat
+setup.bat
+dev-setup.sh
+scripts/dev/
+scripts/local/
+*.local.js
+*.local.ts
+
+# Backup and archive files
+*.backup
+*.bak
+*.old
+*.orig
+*.save
+*.archive
+*.zip
+*.tar.gz
+*.rar
+
+# Sensitive files and secrets
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets.json
+.secrets
+private/
+
+# Local development tools
+.devcontainer/
+docker-compose.override.yml
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Analytics and monitoring
+.sentry/
+.lighthouse/
+lighthouse-report.html
+
+# Miscellaneous
+.tmp/
+temp/
+tmp/
+.temp/
+*.tgz
+
+# Security scanning and audit files
+audit.json
+security-report.json
+vulnerability-report.json
+
+# Performance and profiling
+.clinic/
+profile.json
+*.cpuprofile
+*.heapprofile
+
+# AI and ML related (if applicable)
+*.model
+*.pkl
+*.joblib
+training_data/
+
+# Generated documentation
+docs/generated/
+api-docs/generated/
+
+# Compiled binary files
+*.exe
+*.dll
+*.so
+*.dylib 
