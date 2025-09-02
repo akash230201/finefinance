@@ -1,4 +1,5 @@
 import { getAccountWithTransactions } from "@/actions/accounts";
+import { CurrencyDisplay } from "@/components/currency-display";
 import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
 import { BarLoader } from "react-spinners";
@@ -29,7 +30,7 @@ const AccountPage = async ({ params }) => {
         </div>
         <div className="text-right pb-2">
           <div className="text-2xl sm:text-3xl font-bold">
-            ${parseFloat(account.balance).toFixed(2)}
+            <CurrencyDisplay amount={parseFloat(account.balance)} />
           </div>
           <p className="text-sm sm:text-md text-muted-foreground">
             {account._count.transactions} Transactions

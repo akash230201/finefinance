@@ -9,11 +9,19 @@ import { success } from "zod";
 const serializeTransaction = (obj) => {
   const serialized = { ...obj };
 
-  if (obj.balance) {
-    serialized.balance = obj.balance.toNumber();
-  }
   if (obj.amount) {
     serialized.amount = obj.amount.toNumber();
+  }
+
+  // Convert Date objects to ISO strings for client components
+  if (obj.createdAt) {
+    serialized.createdAt = obj.createdAt.toISOString();
+  }
+  if (obj.updatedAt) {
+    serialized.updatedAt = obj.updatedAt.toISOString();
+  }
+  if (obj.date) {
+    serialized.date = obj.date.toISOString();
   }
 
   return serialized;
@@ -63,7 +71,12 @@ export async function createAccount(data) {
       },
     });
 
-    const serializedAccount = serializeTransaction(account);
+    const serializedAccount = {
+      ...account,
+      balance: account.balance.toNumber(),
+      createdAt: account.createdAt.toISOString(),
+      updatedAt: account.updatedAt.toISOString(),
+    };
 
     revalidatePath("/dashboard/accounts");
 
@@ -96,9 +109,15 @@ export async function getUserAccounts() {
     },
   });
 
-  const serializedAccount = accounts.map(serializeTransaction);
+  // Properly serialize accounts with balance conversion
+  const serializedAccounts = accounts.map((account) => ({
+    ...account,
+    balance: account.balance.toNumber(),
+    createdAt: account.createdAt.toISOString(),
+    updatedAt: account.updatedAt.toISOString(),
+  }));
 
-  return serializedAccount;
+  return serializedAccounts;
 }
 
 export async function getDashboardData() {

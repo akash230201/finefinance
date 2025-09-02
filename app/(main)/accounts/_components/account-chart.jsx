@@ -8,6 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CurrencyDisplay } from "@/components/currency-display";
+import { useCurrency } from "@/contexts/currency-context";
 import { endOfDay, format, startOfDay, subDays } from "date-fns";
 import React, { useMemo, useState } from "react";
 import {
@@ -33,6 +35,7 @@ const DATE_RANGE = {
 
 const AccountChart = ({ transactions }) => {
   const [dateRange, setDateRange] = useState("last30Days");
+  const { formatAmount } = useCurrency();
 
   const filteredData = useMemo(() => {
     const range = DATE_RANGE[dateRange];
@@ -107,14 +110,14 @@ const AccountChart = ({ transactions }) => {
             <div className="text-center">
               <p className="text-muted-foreground">Total Income:</p>
               <p className="text-lg font-bold text-green-500">
-                ${totals.income.toFixed(2)}
+                <CurrencyDisplay amount={totals.income} />
               </p>
             </div>
 
             <div className="text-center">
               <p className="text-muted-foreground">Total Expenses:</p>
               <p className="text-lg font-bold text-red-500">
-                ${totals.expense.toFixed(2)}
+                <CurrencyDisplay amount={totals.expense} />
               </p>
             </div>
 
@@ -127,7 +130,9 @@ const AccountChart = ({ transactions }) => {
                     : "text-green-500"
                 }`}
               >
-                ${Math.max(totals.income - totals.expense, 0).toFixed(2)}
+                <CurrencyDisplay
+                  amount={Math.max(totals.income - totals.expense, 0)}
+                />
               </p>
             </div>
           </div>
@@ -148,9 +153,17 @@ const AccountChart = ({ transactions }) => {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `$${value.toFixed(2)}`}
+                  tickFormatter={(value) => formatAmount(value)}
                 />
-                <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+                <Tooltip
+                  formatter={(value, name) => [formatAmount(value), name]}
+                  labelStyle={{ color: "#666" }}
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--background))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px",
+                  }}
+                />
                 <Legend />
                 <Bar
                   dataKey="income"

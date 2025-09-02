@@ -6,18 +6,15 @@ import { defaultCategories } from "@/data/categories";
 import { redirect } from "next/navigation";
 
 const AddTransactionPage = async ({ searchParams }) => {
-  const rawAccounts = await getUserAccounts();
-  const editId = searchParams?.edit;
+  const accounts = await getUserAccounts();
+  const resolvedSearchParams = await searchParams;
+  const editId = resolvedSearchParams?.edit;
   const isEditMode = !!editId;
 
-  // Ensure all account balances are properly serialized (fix for Decimal objects)
-  const accounts = rawAccounts.map((account) => ({
-    ...account,
-    balance:
-      typeof account.balance === "object" && account.balance !== null
-        ? parseFloat(account.balance.toString())
-        : account.balance,
-  }));
+  // Check if user has any accounts - redirect to dashboard if not
+  if (!accounts || accounts.length === 0) {
+    redirect("/dashboard");
+  }
 
   let transactionData = null;
 

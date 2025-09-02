@@ -7,6 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CurrencyDisplay } from "@/components/currency-display";
 import { Switch } from "@/components/ui/switch";
 import useFetch from "@/hooks/use-fetch";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
@@ -63,7 +64,7 @@ const AccountCard = ({ account }) => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold tracking-tight text-foreground/90">
-            ${parseFloat(balance).toFixed(2)}
+            <CurrencyDisplay amount={parseFloat(balance)} />
           </div>
           <p className="text-xs text-muted-foreground/80 mb-2 tracking-wide">
             {type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()} Account

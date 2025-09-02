@@ -24,34 +24,11 @@ export const createTransaction = async (data) => {
       throw new Error("User not authenticated");
     }
 
-    // Arcjet rate limiting
     const req = await request();
+    const decision = await aj.protect(req, { userId });
 
-    // Check the rate limit status
-    console.log("Checking rate limit for user:", userId);
-    const decision = await aj.protect(req, { userId, requested: 1 });
-    console.log(
-      "Rate limit decision:",
-      decision.isAllowed() ? "ALLOWED" : "DENIED"
-    );
-
-    // Use isAllowed() instead of isDenied to avoid beta version bugs
-    if (!decision.isAllowed()) {
-      if (decision.reason && decision.reason.isRateLimit()) {
-        const { remaining, reset } = decision.reason;
-        console.error({
-          code: "RATE_LIMIT_EXCEEDED",
-          details: {
-            remaining,
-            resetInSeconds: reset,
-          },
-        });
-        throw new Error("Rate limit exceeded. Please try again later.");
-      } else {
-        // Handle other denial reasons
-        console.error("Request denied by security policy:", decision.reason);
-        throw new Error("Request denied by security policy.");
-      }
+    if (decision.isDenied()) {
+      throw new Error("Too many requests");
     }
 
     const user = await db.user.findUnique({
@@ -84,10 +61,12 @@ export const createTransaction = async (data) => {
               : null,
         },
       });
+
       await tx.account.update({
         where: { id: account.id },
         data: { balance: newBalance },
       });
+
       return newTransaction;
     });
 
@@ -96,8 +75,6 @@ export const createTransaction = async (data) => {
 
     return { success: true, data: serializeAmount(transaction) };
   } catch (error) {
-    console.error("Transaction creation error:", error);
-    // Throw the error instead of returning it to trigger useFetch error handling
     throw error;
   }
 };

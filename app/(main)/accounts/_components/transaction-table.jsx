@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CurrencyDisplay } from "@/components/currency-display";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -371,8 +372,8 @@ const TransactionTable = ({ transactions }) => {
                       color: transaction.type === "EXPENSE" ? "red" : "green",
                     }}
                   >
-                    {transaction.type === "EXPENSE" ? "-" : "+"}$
-                    {parseFloat(transaction.amount).toFixed(2)}
+                    {transaction.type === "EXPENSE" ? "-" : "+"}
+                    <CurrencyDisplay amount={parseFloat(transaction.amount)} />
                   </TableCell>
                   <TableCell>
                     {transaction.isRecurring ? (

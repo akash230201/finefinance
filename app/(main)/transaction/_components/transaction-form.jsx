@@ -4,6 +4,9 @@ import { createTransaction, updateTransaction } from "@/actions/transaction";
 import { transactionSchema } from "@/app/lib/schema";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { Button } from "@/components/ui/button";
+import { CurrencyDisplay } from "@/components/currency-display";
+import { useCurrency } from "@/contexts/currency-context";
+import { formatCurrency } from "@/lib/currency";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import {
@@ -42,6 +45,9 @@ const AddTransactionForm = ({
 
   // Determine if we're in edit mode based on editId or editMode prop
   const isEditMode = editMode || !!editId;
+  const { currentCurrency, convertToUSD, convertFromUSD, formatAmount } =
+    useCurrency();
+
   const {
     register,
     setValue,
@@ -60,6 +66,7 @@ const AddTransactionForm = ({
       accountId: accounts?.find((ac) => ac.isDefault)?.id || "",
       category: "",
       isRecurring: false,
+      recurringInterval: undefined,
     },
   });
 
@@ -77,14 +84,45 @@ const AddTransactionForm = ({
   const category = watch("category");
 
   const onSubmit = async (data) => {
+    // Validate required fields
+    if (!data.amount || parseFloat(data.amount) <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+
+    if (!data.accountId) {
+      toast.error("Please select an account");
+      return;
+    }
+
+    if (!data.category) {
+      toast.error("Please select a category");
+      return;
+    }
+
+    const userInputAmount = parseFloat(data.amount);
+    // Convert amount from user's currency to USD for database storage
+    const usdAmount = convertToUSD(userInputAmount, currentCurrency);
+
     const formData = {
       ...data,
-      amount: parseFloat(data.amount),
+      amount: usdAmount, // Store USD amount in database
+      // Fix recurringInterval: if not recurring or empty string, set to undefined
+      recurringInterval:
+        data.isRecurring && data.recurringInterval
+          ? data.recurringInterval
+          : undefined,
     };
-    if (isEditMode) {
-      transactionFn(editId, formData);
-    } else {
-      await transactionFn(formData);
+
+    try {
+      if (isEditMode) {
+        await transactionFn(editId, formData);
+      } else {
+        await transactionFn(formData);
+      }
+    } catch (error) {
+      console.error("❌ Transaction error:", error);
+      toast.error("Failed to submit transaction: " + error.message);
     }
   };
 
@@ -99,7 +137,6 @@ const AddTransactionForm = ({
         reset();
         router.push(`/accounts/${transactionResult.data.accountId}`);
       } else if (transactionResult.error) {
-        // Handle error responses (defensive programming)
         toast.error(transactionResult.error);
       }
     }
@@ -110,7 +147,12 @@ const AddTransactionForm = ({
     if (isEditMode && initialData) {
       // Only populate if we're in edit mode AND have initial data
       setValue("type", initialData.type);
-      setValue("amount", initialData.amount.toString());
+      // Convert USD amount back to user's currency for editing
+      const userCurrencyAmount = convertFromUSD(
+        initialData.amount,
+        currentCurrency
+      );
+      setValue("amount", userCurrencyAmount.toString());
       setValue("description", initialData.description || "");
       setValue("accountId", initialData.accountId);
       setValue("category", initialData.category);
@@ -128,9 +170,16 @@ const AddTransactionForm = ({
       setValue("category", "");
       setValue("date", new Date());
       setValue("isRecurring", false);
-      setValue("recurringInterval", "");
+      setValue("recurringInterval", undefined);
     }
-  }, [isEditMode, initialData, setValue, accounts]);
+  }, [
+    isEditMode,
+    initialData,
+    setValue,
+    accounts,
+    convertFromUSD,
+    currentCurrency,
+  ]);
 
   const filteredCategories = categories.filter(
     (category) => category.type === type
@@ -138,7 +187,12 @@ const AddTransactionForm = ({
 
   const handleScanComplete = (scannedData) => {
     if (scannedData) {
-      setValue("amount", scannedData.amount.toString());
+      // Convert scanned amount (assumed to be USD) to user's currency
+      const userCurrencyAmount =
+        currentCurrency === "USD"
+          ? scannedData.amount
+          : convertFromUSD(scannedData.amount, currentCurrency);
+      setValue("amount", userCurrencyAmount.toString());
       setValue("date", new Date(scannedData.date));
       if (scannedData.description) {
         setValue("description", scannedData.description);
@@ -194,15 +248,40 @@ const AddTransactionForm = ({
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    Amount
+                    Amount ({currentCurrency})
                   </label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    className="h-11 text-lg border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 focus:shadow-md transition-all duration-200 bg-background/50"
-                    {...register("amount")}
-                  />
+                  <div className="space-y-2">
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder={`0.00 ${currentCurrency}`}
+                      className="h-11 text-lg border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 focus:shadow-md transition-all duration-200 bg-background/50"
+                      {...register("amount")}
+                    />
+                    {/* Currency conversion preview */}
+                    {watch("amount") && parseFloat(watch("amount")) > 0 && (
+                      <div className="text-sm text-muted-foreground bg-muted/30 p-2 rounded-md border">
+                        <div className="flex items-center justify-between">
+                          <span>
+                            <span className="font-medium">Input: </span>
+                            {formatCurrency(
+                              parseFloat(watch("amount")),
+                              currentCurrency,
+                              true
+                            )}
+                          </span>
+                          <span>
+                            <span className="font-medium">Stored: </span>$
+                            {convertToUSD(
+                              parseFloat(watch("amount")),
+                              currentCurrency
+                            ).toFixed(2)}{" "}
+                            USD
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   {errors.amount && (
                     <p className="text-sm text-destructive">
                       {errors.amount.message}
@@ -237,7 +316,9 @@ const AddTransactionForm = ({
                           <div className="flex items-center justify-between w-full">
                             <span>{account.name}</span>
                             <span className="text-muted-foreground ml-2">
-                              ${parseFloat(account.balance).toFixed(2)}
+                              <CurrencyDisplay
+                                amount={parseFloat(account.balance)}
+                              />
                             </span>
                           </div>
                         </SelectItem>
@@ -375,9 +456,13 @@ const AddTransactionForm = ({
                   <Switch
                     id="isRecurring"
                     checked={isRecurring}
-                    onCheckedChange={(checked) =>
-                      setValue("isRecurring", checked)
-                    }
+                    onCheckedChange={(checked) => {
+                      setValue("isRecurring", checked);
+                      // Clear recurringInterval when turning off recurring
+                      if (!checked) {
+                        setValue("recurringInterval", undefined);
+                      }
+                    }}
                   />
                 </div>
 

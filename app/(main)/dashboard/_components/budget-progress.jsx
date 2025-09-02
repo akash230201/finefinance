@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CurrencyDisplay } from "@/components/currency-display";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import useFetch from "@/hooks/use-fetch";
@@ -55,8 +56,7 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
 
   useEffect(() => {
     if (updatedBudget) {
-      console.log("Updated budget response:", updatedBudget);
-      if (updatedBudget.success) {
+        if (updatedBudget.success) {
         setIsEnding(false);
         toast.success("Budget updated successfully.");
       } else if (updatedBudget.error) {
@@ -84,40 +84,56 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
           <CardTitle>Monthly Budget Progress (Default Account)</CardTitle>
           <div className="flex items-center gap-2 mt-1">
             {isEnding ? (
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  value={newBudget}
-                  onChange={(e) => setNewBudget(e.target.value)}
-                  className="w-32"
-                  placeholder="Enter Amount"
-                  autoFocus
-                  disabled={isLoading}
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleUpdateBudget}
-                  disabled={isLoading}
-                >
-                  <Check className="h-4 w-4 text-green-500" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                >
-                  <X className="h-4 w-4 text-red-500" />
-                </Button>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    value={newBudget}
+                    onChange={(e) => setNewBudget(e.target.value)}
+                    className="w-32"
+                    placeholder="Enter Amount"
+                    autoFocus
+                    disabled={isLoading}
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleUpdateBudget}
+                    disabled={isLoading}
+                  >
+                    <Check className="h-4 w-4 text-green-500" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleCancel}
+                    disabled={isLoading}
+                  >
+                    <X className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+                {newBudget && parseFloat(newBudget) > 0 && (
+                  <div className="text-xs text-muted-foreground">
+                    Budget:{" "}
+                    <CurrencyDisplay
+                      amount={parseFloat(newBudget)}
+                      showCode={true}
+                    />{" "}
+                    (stored as USD)
+                  </div>
+                )}
               </div>
             ) : (
               <>
                 <CardDescription>
-                  {initialBudget?.amount
-                    ? `$${currentExpenses.toFixed(2)} 
-                spent of $${initialBudget.amount.toFixed(2)}`
-                    : "No budget set"}
+                  {initialBudget?.amount ? (
+                    <>
+                      <CurrencyDisplay amount={currentExpenses} /> spent of{" "}
+                      <CurrencyDisplay amount={initialBudget.amount} />
+                    </>
+                  ) : (
+                    "No budget set"
+                  )}
                 </CardDescription>
                 <Button
                   variant="ghost"

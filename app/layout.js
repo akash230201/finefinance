@@ -7,6 +7,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
 import { Toaster } from "sonner";
+import { Chatbot } from "@/components/chatbot";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({ children }) {
 
               <main className="min-h-[calc(100vh-64px)]">{children}</main>
               <Toaster />
+              <Chatbot />
 
               <footer className="py-12 border-t border-border/10">
                 <div className="container mx-auto px-4">
