@@ -4,7 +4,9 @@ import { db } from "@/lib/prisma";
 import { chatAj, guestChatAj } from "@/lib/arcjet-chat";
 import { NextResponse } from "next/server";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const genAI = process.env.GEMINI_API_KEY
+  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+  : null;
 
 // Helper function to get monthly stats (same as monthly report)
 async function getMonthlyStats(userId, month) {
@@ -45,7 +47,6 @@ async function getMonthlyStats(userId, month) {
 // Get financial context for authenticated users (using monthly report approach)
 async function getFinancialContext(userId) {
   try {
-
     let user = await db.user.findUnique({
       where: { clerkUserId: userId },
       include: { accounts: true },
@@ -53,7 +54,7 @@ async function getFinancialContext(userId) {
 
     // If user doesn't exist, create them (this can happen if chatbot is accessed first)
     if (!user) {
-        try {
+      try {
         // Get user details from Clerk
         const clerkUser = await currentUser();
 
@@ -69,7 +70,7 @@ async function getFinancialContext(userId) {
             },
             include: { accounts: true },
           });
-              }
+        }
       } catch (createError) {
         console.error("Error creating user:", createError);
         return null;
@@ -77,7 +78,7 @@ async function getFinancialContext(userId) {
     }
 
     if (!user) {
-        return null;
+      return null;
     }
 
     // Get last 90 days of transactions with account details
@@ -140,14 +141,13 @@ async function getFinancialContext(userId) {
       });
     }
 
-
     // If no data exists, return null to trigger the "no data" system prompt
     if (
       transactions.length === 0 &&
       user.accounts.length === 0 &&
       budgets.length === 0
     ) {
-        return null;
+      return null;
     }
 
     // Calculate summary statistics using the same approach as monthly report
@@ -265,6 +265,17 @@ const platformInfo = {
 
 export async function POST(request) {
   try {
+    // Check if required services are available
+    if (!genAI) {
+      return NextResponse.json(
+        {
+          error: "service_unavailable",
+          message: "Chat service is currently unavailable.",
+        },
+        { status: 503 }
+      );
+    }
+
     const req = await request;
     const body = await req.json();
     const { message, conversationHistory = [] } = body;
@@ -315,8 +326,8 @@ export async function POST(request) {
 
     if (isAuthenticated) {
       // Get financial context for authenticated users
-        financialData = await getFinancialContext(userId);
-  
+      financialData = await getFinancialContext(userId);
+
       if (financialData) {
         const currentMonth = new Date().toLocaleString("default", {
           month: "long",
