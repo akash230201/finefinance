@@ -16,6 +16,7 @@ import {
   MobileNavigationButtons,
 } from "./navigation-buttons";
 import { ConditionalLogo } from "./conditional-logo";
+import { CurrencySelector } from "./currency-selector";
 
 const Header = async () => {
   await checkUser();
@@ -28,6 +29,7 @@ const Header = async () => {
         <div className="flex items-center gap-2 md:gap-3">
           <HeaderClient>
             <SignedIn>
+              <CurrencySelector />
               <NavigationButtons />
             </SignedIn>
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { LayoutDashboard, PenBox } from "lucide-react";
+import { LayoutDashboard, PenBox, Globe } from "lucide-react";
 import { useCurrentPath } from "@/hooks/use-current-path";
 
 export function NavigationButtons() {
@@ -23,6 +23,17 @@ export function NavigationButtons() {
           </Button>
         </Link>
       )}
+
+      <Link href="/currency">
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-md h-9 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200"
+        >
+          <Globe size={16} className="mr-2" />
+          <span>Currency</span>
+        </Button>
+      </Link>
 
       <Link href="/transaction/create">
         <Button
@@ -52,6 +63,14 @@ export function MobileNavigationButtons() {
           Dashboard
         </Link>
       )}
+
+      <Link
+        href="/currency"
+        className="flex items-center px-2 py-3 text-base font-medium hover:bg-muted rounded-md transition-colors duration-200"
+      >
+        <Globe size={18} className="mr-3" />
+        Currency Center
+      </Link>
 
       <Link
         href="/transaction/create"

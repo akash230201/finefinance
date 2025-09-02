@@ -16,6 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  CurrencyDisplay,
+  useFormattedCurrency,
+} from "@/components/currency-display";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import {
@@ -36,6 +40,7 @@ import {
 } from "recharts";
 
 const DashboardOverview = ({ account, transactions }) => {
+  const { format: formatCurrency } = useFormattedCurrency();
   const [selectedAccount, setSelectedAccount] = useState(
     account.find((a) => a.isDefault)?.id || account[0]?.id
   );
@@ -114,7 +119,7 @@ const DashboardOverview = ({ account, transactions }) => {
         <div className="bg-background border border-border/40 rounded-lg shadow-lg p-3">
           <p className="font-medium text-sm">{data.payload.name}</p>
           <p className="text-sm text-muted-foreground">
-            ${data.value.toFixed(2)} ({data.payload.percentage}%)
+            <CurrencyDisplay amount={data.value} /> ({data.payload.percentage}%)
           </p>
         </div>
       );
@@ -161,7 +166,7 @@ const DashboardOverview = ({ account, transactions }) => {
                   <div className="flex items-center justify-between w-full">
                     <span className="font-medium">{account.name}</span>
                     <span className="text-xs text-muted-foreground ml-2">
-                      ${parseFloat(account.balance).toFixed(2)}
+                      <CurrencyDisplay amount={parseFloat(account.balance)} />
                     </span>
                   </div>
                 </SelectItem>
@@ -239,8 +244,8 @@ const DashboardOverview = ({ account, transactions }) => {
                         : "text-green-600"
                     )}
                   >
-                    {transaction.type === "EXPENSE" ? "-" : "+"}$
-                    {parseFloat(transaction.amount).toFixed(2)}
+                    {transaction.type === "EXPENSE" ? "-" : "+"}
+                    <CurrencyDisplay amount={parseFloat(transaction.amount)} />
                   </p>
                   {transaction.isRecurring && (
                     <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
@@ -272,7 +277,7 @@ const DashboardOverview = ({ account, transactions }) => {
                   <span className="text-xs font-medium">Income</span>
                 </div>
                 <p className="text-sm font-semibold">
-                  ${totalIncome.toFixed(2)}
+                  <CurrencyDisplay amount={totalIncome} />
                 </p>
               </div>
               <div className="text-right">
@@ -281,7 +286,7 @@ const DashboardOverview = ({ account, transactions }) => {
                   <span className="text-xs font-medium">Expenses</span>
                 </div>
                 <p className="text-sm font-semibold">
-                  ${totalExpenses.toFixed(2)}
+                  <CurrencyDisplay amount={totalExpenses} />
                 </p>
               </div>
             </div>
@@ -352,7 +357,7 @@ const DashboardOverview = ({ account, transactions }) => {
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold">
-                          ${category.value.toFixed(2)}
+                          <CurrencyDisplay amount={category.value} />
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {category.percentage}%
@@ -375,8 +380,8 @@ const DashboardOverview = ({ account, transactions }) => {
                         : "text-red-600"
                     )}
                   >
-                    {totalIncome - totalExpenses >= 0 ? "+" : ""}$
-                    {(totalIncome - totalExpenses).toFixed(2)}
+                    {totalIncome - totalExpenses >= 0 ? "+" : ""}
+                    <CurrencyDisplay amount={totalIncome - totalExpenses} />
                   </span>
                 </div>
               </div>

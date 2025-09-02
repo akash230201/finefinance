@@ -16,16 +16,17 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  clerkUserId   String    @unique // clerk user id
-  email         String    @unique
-  name          String?
-  imageUrl      String?
-  transactions  Transaction[]
-  accounts      Account[]
-  budgets       Budget[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id               String        @id @default(uuid())
+  clerkUserId      String        @unique // clerk user id
+  email            String        @unique
+  name             String?
+  imageUrl         String?
+  preferredCurrency String       @default("USD") // User's preferred currency for display
+  transactions     Transaction[]
+  accounts         Account[]
+  budgets          Budget[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   @@map("users")
 }
