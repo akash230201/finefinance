@@ -26,6 +26,201 @@ export default function EmailTemplate({
     accountName: "Default Account",
   },
 }) {
+  if (type === "monthly-report") {
+    const { stats, month, insights = [] } = data;
+    const netIncome = stats.totalIncome - stats.totalExpenses;
+    const isPositiveNet = netIncome >= 0;
+    const topExpenseCategory = Object.entries(stats.byCategory || {}).sort(
+      ([, a], [, b]) => b - a
+    )[0];
+
+    return (
+      <Html>
+        <Head />
+        <Preview>
+          Your {month} Financial Report - ${stats.totalIncome.toFixed(2)}{" "}
+          income, ${stats.totalExpenses.toFixed(2)} expenses
+        </Preview>
+        <Body style={bodyStyle}>
+          <Container style={containerStyle}>
+            {/* Header */}
+            <Section style={headerStyle}>
+              <Text style={logoTextStyle}>FineFinance</Text>
+            </Section>
+
+            {/* Main Content */}
+            <Section style={contentStyle}>
+              <Heading style={titleStyle}>
+                Your {month}{" "}
+                <span style={{ color: "#3ab0a2" }}>Financial Report</span>
+              </Heading>
+
+              <Text style={greetingStyle}>Hello {userName},</Text>
+
+              <Text style={introTextStyle}>
+                Here's a comprehensive overview of your financial activity for{" "}
+                {month}. We've included AI-powered insights to help you make
+                better financial decisions.
+              </Text>
+
+              {/* Monthly Summary Stats */}
+              <Section>
+                <Heading style={sectionTitleStyle}>📊 Monthly Summary</Heading>
+                <Row style={statsRowStyle}>
+                  <Column style={statColumnStyle}>
+                    <Section style={statBoxStyle}>
+                      <Text style={statLabelStyle}>Total Income</Text>
+                      <Text style={{ ...statValueStyle, color: "#10b981" }}>
+                        ${stats.totalIncome.toFixed(2)}
+                      </Text>
+                    </Section>
+                  </Column>
+
+                  <Column style={statColumnStyle}>
+                    <Section style={statBoxStyle}>
+                      <Text style={statLabelStyle}>Total Expenses</Text>
+                      <Text style={{ ...statValueStyle, color: "#ef4444" }}>
+                        ${stats.totalExpenses.toFixed(2)}
+                      </Text>
+                    </Section>
+                  </Column>
+
+                  <Column style={statColumnStyle}>
+                    <Section style={statBoxStyle}>
+                      <Text style={statLabelStyle}>Net Income</Text>
+                      <Text
+                        style={{
+                          ...statValueStyle,
+                          color: isPositiveNet ? "#10b981" : "#ef4444",
+                        }}
+                      >
+                        {isPositiveNet ? "+" : ""}${netIncome.toFixed(2)}
+                      </Text>
+                    </Section>
+                  </Column>
+                </Row>
+
+                {/* Transaction Count */}
+                <Section style={metricBoxStyle}>
+                  <Text style={metricLabelStyle}>Total Transactions</Text>
+                  <Text style={metricValueStyle}>{stats.transactionCount}</Text>
+                </Section>
+              </Section>
+
+              {/* Top Expense Category */}
+              {topExpenseCategory && (
+                <Section>
+                  <Heading style={sectionTitleStyle}>
+                    💳 Top Expense Category
+                  </Heading>
+                  <Section style={categoryBoxStyle}>
+                    <Text style={categoryNameStyle}>
+                      {topExpenseCategory[0]}
+                    </Text>
+                    <Text style={categoryAmountStyle}>
+                      ${topExpenseCategory[1].toFixed(2)}
+                    </Text>
+                  </Section>
+                </Section>
+              )}
+
+              {/* AI Insights */}
+              {insights.length > 0 && (
+                <Section>
+                  <Heading style={sectionTitleStyle}>
+                    🤖 AI-Powered Insights
+                  </Heading>
+                  {insights.map((insight, index) => (
+                    <Section key={index} style={insightBoxStyle}>
+                      <Text style={insightTextStyle}>
+                        <strong>{index + 1}.</strong> {insight}
+                      </Text>
+                    </Section>
+                  ))}
+                </Section>
+              )}
+
+              {/* Expense Breakdown */}
+              {Object.keys(stats.byCategory || {}).length > 0 && (
+                <Section>
+                  <Heading style={sectionTitleStyle}>
+                    📈 Expense Breakdown
+                  </Heading>
+                  <Section style={breakdownContainerStyle}>
+                    {Object.entries(stats.byCategory)
+                      .sort(([, a], [, b]) => b - a)
+                      .slice(0, 5)
+                      .map(([category, amount]) => (
+                        <Row key={category} style={breakdownRowStyle}>
+                          <Column style={breakdownCategoryStyle}>
+                            <Text style={breakdownCategoryTextStyle}>
+                              {category}
+                            </Text>
+                          </Column>
+                          <Column style={breakdownAmountStyle}>
+                            <Text style={breakdownAmountTextStyle}>
+                              ${amount.toFixed(2)}
+                            </Text>
+                          </Column>
+                        </Row>
+                      ))}
+                  </Section>
+                </Section>
+              )}
+
+              {/* Call to Action */}
+              <Section style={ctaContainerStyle}>
+                <Button
+                  style={buttonStyle}
+                  href="https://finefinance.vercel.app/dashboard"
+                >
+                  View Full Dashboard
+                </Button>
+              </Section>
+
+              {/* Tip Section */}
+              <Section style={tipStyle}>
+                <Text style={tipTextStyle}>
+                  <strong>💡 Tip:</strong> Regular financial reviews help you
+                  stay on track with your goals. Consider setting up budgets for
+                  your top expense categories.
+                </Text>
+              </Section>
+            </Section>
+
+            {/* Footer */}
+            <Hr style={dividerStyle} />
+            <Section style={footerStyle}>
+              <Text style={footerTextStyle}>
+                © 2025 FineFinance •{" "}
+                <Link
+                  href="https://twitter.com/finefinance"
+                  style={socialLinkStyle}
+                >
+                  Twitter
+                </Link>
+                {" • "}
+                <Link
+                  href="https://linkedin.com/company/finefinance"
+                  style={socialLinkStyle}
+                >
+                  LinkedIn
+                </Link>
+                {" • "}
+                <Link
+                  href="https://github.com/finefinance"
+                  style={socialLinkStyle}
+                >
+                  GitHub
+                </Link>
+              </Text>
+            </Section>
+          </Container>
+        </Body>
+      </Html>
+    );
+  }
+
   if (type === "budget-alert") {
     // Calculate remaining amount and set appropriate color based on percentage used
     const remainingAmount = data.budgetAmount - data.totalExpenses;
@@ -361,4 +556,116 @@ const socialSeparatorStyle = {
   color: "#6b7280",
   margin: "0 8px",
   fontSize: "14px",
+};
+
+// Additional styles for monthly report
+const introTextStyle = {
+  fontSize: "16px",
+  color: "#4b5563",
+  lineHeight: "1.6",
+  margin: "0 0 25px",
+};
+
+const sectionTitleStyle = {
+  fontSize: "20px",
+  fontWeight: "700",
+  color: "#1f2937",
+  margin: "25px 0 15px",
+  padding: "0",
+};
+
+const metricBoxStyle = {
+  backgroundColor: "#f3f4f6",
+  borderRadius: "8px",
+  padding: "15px",
+  textAlign: "center",
+  margin: "15px 0",
+};
+
+const metricLabelStyle = {
+  fontSize: "14px",
+  color: "#6b7280",
+  margin: "0 0 5px",
+  fontWeight: "500",
+};
+
+const metricValueStyle = {
+  fontSize: "24px",
+  fontWeight: "700",
+  color: "#3ab0a2",
+  margin: "0",
+};
+
+const categoryBoxStyle = {
+  backgroundColor: "#fef3c7",
+  border: "1px solid #f59e0b",
+  borderRadius: "8px",
+  padding: "15px",
+  textAlign: "center",
+  margin: "10px 0 20px",
+};
+
+const categoryNameStyle = {
+  fontSize: "16px",
+  fontWeight: "600",
+  color: "#92400e",
+  margin: "0 0 5px",
+};
+
+const categoryAmountStyle = {
+  fontSize: "20px",
+  fontWeight: "700",
+  color: "#f59e0b",
+  margin: "0",
+};
+
+const insightBoxStyle = {
+  backgroundColor: "#eff6ff",
+  border: "1px solid #3b82f6",
+  borderLeft: "4px solid #3b82f6",
+  borderRadius: "8px",
+  padding: "15px",
+  margin: "10px 0",
+};
+
+const insightTextStyle = {
+  fontSize: "15px",
+  color: "#1e40af",
+  lineHeight: "1.5",
+  margin: "0",
+};
+
+const breakdownContainerStyle = {
+  backgroundColor: "#f9fafb",
+  borderRadius: "8px",
+  padding: "15px",
+  margin: "10px 0 20px",
+};
+
+const breakdownRowStyle = {
+  borderBottom: "1px solid #e5e7eb",
+  padding: "8px 0",
+  margin: "0",
+};
+
+const breakdownCategoryStyle = {
+  paddingRight: "10px",
+};
+
+const breakdownCategoryTextStyle = {
+  fontSize: "14px",
+  color: "#4b5563",
+  fontWeight: "500",
+  margin: "0",
+};
+
+const breakdownAmountStyle = {
+  textAlign: "right",
+};
+
+const breakdownAmountTextStyle = {
+  fontSize: "14px",
+  color: "#1f2937",
+  fontWeight: "600",
+  margin: "0",
 };
