@@ -18,9 +18,11 @@ import {
 import { useAuth } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useFloatingButtons } from "@/contexts/floating-buttons-context";
 
 export function Chatbot() {
   const { isSignedIn, userId } = useAuth();
+  const { setIsChatbotVisible } = useFloatingButtons();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -59,15 +61,24 @@ export function Chatbot() {
       const distanceFromBottom =
         documentHeight - (currentScrollY + windowHeight);
 
+      let newVisibility;
+
       // Hide when near footer (within 200px) or when scrolling down fast
       if (distanceFromBottom < 200) {
-        setIsVisible(false);
+        newVisibility = false;
       } else if (currentScrollY < lastScrollY || currentScrollY < 100) {
         // Show when scrolling up or near top
-        setIsVisible(true);
+        newVisibility = true;
       } else if (currentScrollY > lastScrollY + 50) {
         // Hide when scrolling down significantly
-        setIsVisible(false);
+        newVisibility = false;
+      } else {
+        newVisibility = isVisible; // Keep current state
+      }
+
+      if (newVisibility !== isVisible) {
+        setIsVisible(newVisibility);
+        setIsChatbotVisible(newVisibility); // Update context
       }
 
       setLastScrollY(currentScrollY);
@@ -75,7 +86,7 @@ export function Chatbot() {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, [lastScrollY, isVisible, setIsChatbotVisible]);
 
   // Welcome message
   useEffect(() => {
@@ -204,7 +215,9 @@ export function Chatbot() {
           "bg-gradient-to-br from-primary to-secondary",
           "hover:shadow-xl hover:scale-105",
           "border border-primary/20",
-          // Visibility
+          // Show only on mobile (hidden on md and up)
+          "md:hidden",
+          // Visibility based on scroll behavior
           isVisible
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-4 pointer-events-none"
