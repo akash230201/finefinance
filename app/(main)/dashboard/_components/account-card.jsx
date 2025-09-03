@@ -71,12 +71,12 @@ const AccountCard = ({ account }) => {
           </p>
         </CardContent>
         <CardFooter className="flex justify-between text-xs text-muted-foreground/70">
-          <div className="flex items-center transition-colors duration-200 hover:text-green-600">
-            <ArrowUpRight className="mr-1 h-4 w-4 text-green-500 transition-transform duration-200 group-hover:scale-110" />
+          <div className="flex items-center chip-income">
+            <ArrowUpRight className="h-3 w-3" />
             Income
           </div>
-          <div className="flex items-center transition-colors duration-200 hover:text-red-600">
-            <ArrowDownRight className="mr-1 h-4 w-4 text-red-500 transition-transform duration-200 group-hover:scale-110" />
+          <div className="flex items-center chip-expense">
+            <ArrowDownRight className="h-3 w-3" />
             Expenses
           </div>
         </CardFooter>

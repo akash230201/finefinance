@@ -189,25 +189,25 @@ const DashboardOverview = ({ account, transactions }) => {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 md:items-stretch">
-      <Card className="border-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden bg-gradient-to-br from-card via-card to-card/95 flex flex-col">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-border/20 bg-gradient-to-r from-muted/10 to-transparent flex-shrink-0">
+      <Card className="border-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden bg-card/80 dark:bg-card/70 flex flex-col backdrop-blur-sm">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b border-border/30 bg-gradient-to-r from-background/40 to-background/10 flex-shrink-0">
           <div className="space-y-1.5">
             <CardTitle className="text-lg font-semibold tracking-tight flex items-center gap-2">
-              <div className="w-2 h-2 bg-gradient-to-r from-primary to-primary/60 rounded-full shadow-sm" />
+              <div className="w-2 h-2 bg-primary rounded-full shadow-sm" />
               Recent Transactions
             </CardTitle>
-            <CardDescription className="text-sm text-muted-foreground/80">
+            <CardDescription className="text-sm text-muted-foreground">
               Latest activity from your selected account
             </CardDescription>
           </div>
           <Select value={selectedAccount} onValueChange={setSelectedAccount}>
-            <SelectTrigger className="w-[160px] h-10 border-border/40 shadow-sm hover:shadow-md hover:border-border/60 transition-all duration-200 bg-background/50 backdrop-blur-sm">
+            <SelectTrigger className="w-[160px] h-10 border-border/50 shadow-sm bg-background/60 backdrop-blur-sm">
               <SelectValue placeholder="Select Account" />
             </SelectTrigger>
             <SelectContent className="border shadow-lg backdrop-blur-md">
               {account.map((account) => (
                 <SelectItem key={account.id} value={account.id}>
-                  <div className="flex items-center justify-between w-full max-w-[150px]">
+                  <div className="flex items-center justify-between w-full max-w-[170px]">
                     <span className="font-medium truncate">{account.name}</span>
                     <span className="text-xs text-muted-foreground ml-2 flex-shrink-0">
                       <CurrencyDisplay amount={parseFloat(account.balance)} />
@@ -235,27 +235,32 @@ const DashboardOverview = ({ account, transactions }) => {
             <div className="flex flex-col flex-1">
               {/* Scrollable transaction list */}
               <div className="relative flex-1">
-                <div className="h-[28rem] overflow-y-auto py-2 scroll-smooth">
-                  <div className="px-6 space-y-2">
+                <div
+                  className="max-h-[26rem] md:max-h-[32rem] overflow-y-auto py-2 scroll-smooth pr-2"
+                  role="list"
+                  aria-label="Recent Transactions"
+                >
+                  <div className="px-4 md:px-6 space-y-2">
                     {recentTransactions.map((transaction, index) => (
                       <div
                         key={transaction.id}
+                        role="listitem"
                         className={cn(
-                          "group relative flex items-center justify-between p-4 rounded-xl border transition-all duration-300 hover:scale-[1.01]",
-                          "bg-gradient-to-r from-background/90 via-background/95 to-background/90",
-                          "border-border/40 hover:border-border/60 hover:shadow-md hover:shadow-primary/5",
+                          "group relative flex items-start justify-between gap-3 p-3 md:p-4 rounded-lg border transition-colors",
+                          "bg-muted/10 hover:bg-muted/20 dark:bg-muted/15 dark:hover:bg-muted/25",
+                          "border-border/40 hover:border-border/60 focus-visible:outline-2 focus-visible:outline-primary/50",
                           index === 0 &&
-                            "ring-1 ring-primary/20 border-primary/30"
+                            "ring-1 ring-primary/30 border-primary/40"
                         )}
                       >
                         {/* Transaction Icon & Details */}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
                           <div
                             className={cn(
-                              "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300 shadow-sm",
+                              "flex h-10 w-10 items-center justify-center rounded-md border shadow-sm flex-shrink-0",
                               transaction.type === "EXPENSE"
-                                ? "bg-gradient-to-br from-red-50/80 to-red-100/60 text-red-600/90"
-                                : "bg-gradient-to-br from-green-50/80 to-green-100/60 text-green-600/90"
+                                ? "bg-red-50 border-red-200 text-red-600 dark:bg-red-500/10 dark:border-red-500/30 dark:text-red-400"
+                                : "bg-green-50 border-green-200 text-green-600 dark:bg-green-500/10 dark:border-green-500/30 dark:text-green-400"
                             )}
                           >
                             {transaction.type === "EXPENSE" ? (
@@ -264,37 +269,33 @@ const DashboardOverview = ({ account, transactions }) => {
                               <ArrowUpRight className="h-4 w-4" />
                             )}
                           </div>
-                          <div className="flex flex-col space-y-1.5 min-w-0 flex-1">
-                            <p className="text-sm font-semibold leading-none text-foreground/90 group-hover:text-foreground transition-colors truncate">
+                          <div className="flex flex-col space-y-1 min-w-0 flex-1">
+                            <p className="text-sm font-medium text-foreground truncate">
                               {transaction.description || "Unknown Transaction"}
                             </p>
-                            <div className="flex items-center space-x-2 text-xs">
-                              <span className="text-muted-foreground/80 font-medium">
+                            <div className="flex flex-wrap items-center gap-2 text-[11px] leading-none">
+                              <span className="text-muted-foreground">
                                 {format(
                                   new Date(transaction.date),
                                   "MMM dd, h:mm a"
                                 )}
                               </span>
                               {transaction.category && (
-                                <>
-                                  <div className="w-1 h-1 bg-muted-foreground/40 rounded-full flex-shrink-0" />
-                                  <span className="text-muted-foreground/80 bg-muted/50 px-2 py-1 rounded-md font-medium truncate max-w-[100px]">
-                                    {transaction.category}
-                                  </span>
-                                </>
+                                <span className="px-2 py-0.5 rounded-md bg-background/60 border border-border/40 text-muted-foreground truncate max-w-[120px]">
+                                  {transaction.category}
+                                </span>
                               )}
                             </div>
                           </div>
                         </div>
-
                         {/* Transaction Amount */}
-                        <div className="flex flex-col items-end space-y-1.5 ml-4 flex-shrink-0">
+                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
                           <p
                             className={cn(
-                              "text-sm font-semibold tabular-nums tracking-tight",
+                              "text-sm font-semibold tabular-nums",
                               transaction.type === "EXPENSE"
-                                ? "text-red-600/90"
-                                : "text-green-600/90"
+                                ? "text-red-600 dark:text-red-400"
+                                : "text-green-600 dark:text-green-400"
                             )}
                           >
                             {transaction.type === "EXPENSE" ? "-" : "+"}
@@ -303,7 +304,7 @@ const DashboardOverview = ({ account, transactions }) => {
                             />
                           </p>
                           {transaction.isRecurring && (
-                            <span className="text-xs bg-gradient-to-r from-blue-50/80 to-blue-100/60 text-blue-700/90 px-2 py-1 rounded-full border border-blue-200/50 font-medium whitespace-nowrap">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-400/30 font-medium">
                               Recurring
                             </span>
                           )}
@@ -316,24 +317,17 @@ const DashboardOverview = ({ account, transactions }) => {
 
               {/* Enhanced "See more" section */}
               {accountTransactions.length > 15 && (
-                <div className="px-6 py-2 border-t border-border/20 bg-gradient-to-r from-muted/5 to-muted/10 mt-auto">
-                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-gradient-to-r from-background/60 to-background/40 border border-border/30 backdrop-blur-sm">
-                    <div className="flex items-center space-x-2.5">
-                      <div className="w-2 h-2 bg-gradient-to-r from-primary/60 to-primary rounded-full animate-pulse" />
-                      <p className="text-xs text-muted-foreground font-medium">
-                        Showing {Math.min(15, accountTransactions.length)} of{" "}
-                        <span className="font-semibold text-foreground">
-                          {accountTransactions.length}
-                        </span>{" "}
-                        transactions
-                      </p>
-                    </div>
+                <div className="px-4 md:px-6 py-2 border-t border-border/30 bg-background/40 backdrop-blur-sm mt-auto">
+                  <div className="flex items-center justify-between p-2 rounded-md bg-muted/10 border border-border/40">
+                    <p className="text-xs text-muted-foreground">
+                      Showing {Math.min(15, accountTransactions.length)} of{" "}
+                      {accountTransactions.length} transactions
+                    </p>
                     <Link
                       href={`/accounts/${selectedAccount}`}
-                      className="text-xs font-semibold text-primary hover:text-primary/80 transition-all duration-200 hover:underline flex items-center space-x-1 group"
+                      className="text-xs font-medium text-primary hover:underline"
                     >
-                      <span>View All</span>
-                      <ArrowUpRight className="h-3 w-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
+                      View All
                     </Link>
                   </div>
                 </div>
@@ -343,34 +337,34 @@ const DashboardOverview = ({ account, transactions }) => {
         </CardContent>
       </Card>
 
-      <Card className="border-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden bg-gradient-to-br from-card via-card to-card/95 flex flex-col">
-        <CardHeader className="pb-4 border-b border-border/20 bg-gradient-to-r from-muted/10 to-transparent flex-shrink-0">
-          <div className="flex flex-row items-center justify-between">
-            <div className="space-y-1.5">
+      <Card className="border-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden bg-card/80 dark:bg-card/70 flex flex-col backdrop-blur-sm">
+        <CardHeader className="pb-4 border-b border-border/30 bg-gradient-to-r from-background/40 to-background/10 flex-shrink-0">
+          <div className="flex flex-row items-start justify-between gap-4 flex-wrap">
+            <div className="space-y-1.5 min-w-[180px]">
               <CardTitle className="text-lg font-semibold tracking-tight flex items-center gap-2">
-                <div className="w-2 h-2 bg-gradient-to-r from-primary to-primary/60 rounded-full shadow-sm" />
+                <div className="w-2 h-2 bg-primary rounded-full" />
                 Monthly Overview
               </CardTitle>
-              <CardDescription className="text-sm text-muted-foreground/80">
+              <CardDescription className="text-sm text-muted-foreground">
                 {format(currentDate, "MMMM yyyy")} expense breakdown
               </CardDescription>
             </div>
-            <div className="flex gap-3">
-              <div className="text-right bg-gradient-to-br from-green-50/50 to-green-100/30 p-2.5 rounded-lg border border-green-200/40 backdrop-blur-sm min-w-0">
-                <div className="flex items-center gap-1.5 text-green-600 mb-1">
-                  <TrendingUp className="h-3 w-3 flex-shrink-0" />
-                  <span className="text-xs font-medium">Income</span>
+            <div className="flex gap-2 flex-wrap">
+              <div className="rounded-md border bg-green-50 border-green-200 text-green-600 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300 px-3 py-2 text-right">
+                <div className="flex items-center gap-1 mb-1 text-green-600 dark:text-green-400">
+                  <TrendingUp className="h-3 w-3" />
+                  <span className="text-[11px] font-medium">Income</span>
                 </div>
-                <p className="text-sm font-semibold truncate">
+                <p className="text-sm font-semibold text-green-300/90 truncate">
                   <CurrencyDisplay amount={totalIncome} />
                 </p>
               </div>
-              <div className="text-right bg-gradient-to-br from-red-50/50 to-red-100/30 p-2.5 rounded-lg border border-red-200/40 backdrop-blur-sm min-w-0">
-                <div className="flex items-center gap-1.5 text-red-600 mb-1">
-                  <TrendingDown className="h-3 w-3 flex-shrink-0" />
-                  <span className="text-xs font-medium">Expenses</span>
+              <div className="rounded-md border bg-red-50 border-red-200 text-red-600 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300 px-3 py-2 text-right">
+                <div className="flex items-center gap-1 mb-1 text-red-600 dark:text-red-400">
+                  <TrendingDown className="h-3 w-3" />
+                  <span className="text-[11px] font-medium">Expenses</span>
                 </div>
-                <p className="text-sm font-semibold truncate">
+                <p className="text-sm font-semibold text-red-300/90 truncate">
                   <CurrencyDisplay amount={totalExpenses} />
                 </p>
               </div>
@@ -394,7 +388,7 @@ const DashboardOverview = ({ account, transactions }) => {
             <div className="space-y-4 p-6 flex-1 flex flex-col">
               {/* Pie Chart */}
               <div className="relative">
-                <div className="h-48 bg-gradient-to-br from-background/60 to-background/20 rounded-xl border border-border/30 p-3 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-300">
+                <div className="h-48 rounded-xl border p-3 backdrop-blur-sm shadow-sm hover:shadow-md transition-all bg-white/60 border-border/40 dark:bg-background/60 dark:border-border/30">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -445,7 +439,7 @@ const DashboardOverview = ({ account, transactions }) => {
                       {pieChartData.map((category, index) => (
                         <div
                           key={category.name}
-                          className="group p-2.5 rounded-lg bg-gradient-to-br from-background/60 via-background/40 to-background/60 border border-border/30 hover:border-border/50 hover:shadow-md hover:shadow-primary/5 transition-all duration-300 hover:scale-[1.02] backdrop-blur-sm"
+                          className="group p-2.5 rounded-lg border bg-white/70 hover:bg-white dark:bg-background/60 dark:hover:bg-background/70 border-border/40 dark:border-border/30 transition-all duration-300 hover:shadow-sm"
                         >
                           <div className="flex flex-col space-y-2">
                             <div className="flex items-center justify-between">
@@ -515,8 +509,8 @@ const DashboardOverview = ({ account, transactions }) => {
                     className={cn(
                       "text-xs font-bold tabular-nums tracking-tight px-2.5 py-1 rounded-lg backdrop-blur-sm",
                       totalIncome - totalExpenses >= 0
-                        ? "text-green-600 bg-gradient-to-r from-green-50/50 to-green-100/30 border border-green-200/40"
-                        : "text-red-600 bg-gradient-to-r from-red-50/50 to-red-100/30 border border-red-200/40"
+                        ? "chip-net-positive"
+                        : "chip-net-negative"
                     )}
                   >
                     {totalIncome - totalExpenses >= 0 ? "+" : ""}

@@ -92,57 +92,53 @@
 }
 
 .dark {
-  /* Dark Theme Colors */
-  --background: #0f172a; /* Dark Theme BG */
-  --foreground: #eaeaea; /* Light Gray for dark mode */
-  --card: #1a2e3b; /* Deep Navy for cards on dark */
-  --card-foreground: #eaeaea;
-  --popover: #1a2e3b;
-  --popover-foreground: #eaeaea;
-
-  /* Primary Brand Colors - Adjusted for dark theme */
-  --primary: #3ab0a2; /* Muted Teal as primary on dark */
-  --primary-foreground: #0f172a;
-  --secondary: #c9f270; /* Soft Lime Green as secondary */
-  --secondary-foreground: #0f172a;
-  --accent: #c9f270; /* Soft Lime Green accent */
-  --accent-foreground: #0f172a;
-
-  /* Neutral Colors for Dark Theme */
-  --muted: #1a2e3b; /* Deep Navy for muted elements */
-  --muted-foreground: #eaeaea;
+  /* Dark Theme Colors (adjusted for higher surface contrast) */
+  --background: #0f172a; /* Deep base */
+  --foreground: #f1f5f9; /* Lighter text for better contrast */
+  --card: #1c2634; /* Raised surface (was #1a2e3b) */
+  --card-foreground: #f1f5f9;
+  --popover: #1c2634; /* Match card for consistency */
+  --popover-foreground: #f1f5f9;
+  --primary: #3ab0a2;
+  --primary-foreground: #08241f;
+  --secondary: #c9f270;
+  --secondary-foreground: #142016;
+  --accent: #c9f270;
+  --accent-foreground: #142016;
+  --muted: #16202c; /* Sub-surface (was #1a2e3b) */
+  --muted-foreground: #cbd5e1;
   --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-
-  /* Borders and Inputs for Dark Theme */
-  --border: #2c2f33; /* Border/Divider Dark */
-  --input: #1a2e3b;
-  --ring: #c9f270; /* Lime green ring for focus */
-
-  /* Chart Colors for Dark Theme */
-  --chart-1: #3ab0a2; /* Muted Teal */
-  --chart-2: #c9f270; /* Soft Lime Green */
-  --chart-3: #1a2e3b; /* Deep Navy */
-  --chart-4: #6b7280; /* Gray */
-  --chart-5: #9ca3af; /* Light Gray */
-
-  /* Sidebar Colors for Dark Theme */
-  --sidebar: #0f172a;
-  --sidebar-foreground: #eaeaea;
+  --destructive-foreground: #fff;
+  --border: #2d3b4a; /* Was #2c2f33 (too close to card) */
+  --input: #203040; /* Was #1a2e3b */
+  --ring: #c9f270; /* Keep for accessibility */
+  --chart-1: #3ab0a2;
+  --chart-2: #c9f270;
+  --chart-3: #1a2e3b;
+  --chart-4: #64748b;
+  --chart-5: #94a3b8;
+  --sidebar: #101d2b; /* Slightly distinct from background */
+  --sidebar-foreground: #e2e8f0;
   --sidebar-primary: #3ab0a2;
-  --sidebar-primary-foreground: #0f172a;
-  --sidebar-accent: #1a2e3b;
-  --sidebar-accent-foreground: #eaeaea;
-  --sidebar-border: #2c2f33;
+  --sidebar-primary-foreground: #08241f;
+  --sidebar-accent: #1c2634;
+  --sidebar-accent-foreground: #e2e8f0;
+  --sidebar-border: #2d3b4a;
   --sidebar-ring: #c9f270;
+  --surface-1: var(--card);
+  --surface-2: #223041; /* Elevated */
+  --surface-3: #28384a; /* Highest elevation */
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    /* Tailwind @apply removed for lint safety; keep semantic variables */
+    border-color: var(--border);
+    outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
   }
   body {
-    @apply bg-background text-foreground;
+    background: var(--background);
+    color: var(--foreground);
   }
 }
 
@@ -210,6 +206,66 @@
       rgba(234, 234, 234, 0.1) 1px,
       transparent 1px
     );
+  }
+
+  /* Financial status chips (plain CSS for compatibility) */
+  .chip-income,
+  .chip-expense,
+  .chip-net-positive,
+  .chip-net-negative {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    border: 1px solid;
+    transition:
+      color 0.2s,
+      background-color 0.2s,
+      border-color 0.2s;
+  }
+  .chip-income {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #86efac;
+  }
+  .dark .chip-income {
+    background: rgba(22, 101, 52, 0.25);
+    color: #86efac;
+    border-color: rgba(134, 239, 172, 0.6);
+  }
+  .chip-expense {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+  }
+  .dark .chip-expense {
+    background: rgba(153, 27, 27, 0.25);
+    color: #fca5a5;
+    border-color: rgba(252, 165, 165, 0.6);
+  }
+  .chip-net-positive {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #6ee7b7;
+  }
+  .dark .chip-net-positive {
+    background: rgba(6, 95, 70, 0.3);
+    color: #6ee7b7;
+    border-color: rgba(110, 231, 183, 0.55);
+  }
+  .chip-net-negative {
+    background: #ffe4e6;
+    color: #9f1239;
+    border-color: #fecdd3;
+  }
+  .dark .chip-net-negative {
+    background: rgba(159, 18, 57, 0.28);
+    color: #fda4af;
+    border-color: rgba(253, 164, 175, 0.55);
   }
 }
 
@@ -403,15 +459,42 @@
   animation: fade-in-up 0.3s ease-out forwards;
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.animate-shimmer {
-  animation: shimmer 1.5s infinite;
+/* --- Dark mode contrast adjustments (improved readability) --- */
+.dark {
+  /* Dark Theme Colors (adjusted for higher surface contrast) */
+  --background: #0f172a; /* Deep base */
+  --foreground: #f1f5f9; /* Lighter text for better contrast */
+  --card: #1c2634; /* Raised surface (was #1a2e3b) */
+  --card-foreground: #f1f5f9;
+  --popover: #1c2634; /* Match card for consistency */
+  --popover-foreground: #f1f5f9;
+  --primary: #3ab0a2;
+  --primary-foreground: #08241f;
+  --secondary: #c9f270;
+  --secondary-foreground: #142016;
+  --accent: #c9f270;
+  --accent-foreground: #142016;
+  --muted: #16202c; /* Sub-surface (was #1a2e3b) */
+  --muted-foreground: #cbd5e1;
+  --destructive: #ef4444;
+  --destructive-foreground: #fff;
+  --border: #2d3b4a; /* Was #2c2f33 (too close to card) */
+  --input: #203040; /* Was #1a2e3b */
+  --ring: #c9f270; /* Keep for accessibility */
+  --chart-1: #3ab0a2;
+  --chart-2: #c9f270;
+  --chart-3: #1a2e3b;
+  --chart-4: #64748b;
+  --chart-5: #94a3b8;
+  --sidebar: #101d2b; /* Slightly distinct from background */
+  --sidebar-foreground: #e2e8f0;
+  --sidebar-primary: #3ab0a2;
+  --sidebar-primary-foreground: #08241f;
+  --sidebar-accent: #1c2634;
+  --sidebar-accent-foreground: #e2e8f0;
+  --sidebar-border: #2d3b4a;
+  --sidebar-ring: #c9f270;
+  --surface-1: var(--card);
+  --surface-2: #223041; /* Elevated */
+  --surface-3: #28384a; /* Highest elevation */
 }

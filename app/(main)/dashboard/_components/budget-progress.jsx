@@ -163,10 +163,10 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
               value={percentageUsed}
               className={
                 percentageUsed >= 90
-                  ? "bg-primary/20 [&>div]:bg-red-500"
+                  ? "bg-muted/40 [&>div]:bg-red-500"
                   : percentageUsed >= 75
-                    ? "bg-primary/20 [&>div]:bg-yellow-500"
-                    : "bg-primary/20 [&>div]:bg-green-500"
+                    ? "bg-muted/40 [&>div]:bg-yellow-500"
+                    : "bg-muted/40 [&>div]:bg-green-500"
               }
             />
             <p className="text-sm text-muted-foreground text-right">
