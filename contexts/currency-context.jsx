@@ -3,10 +3,12 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   SUPPORTED_CURRENCIES,
+  POPULAR_CURRENCIES,
   DEFAULT_CURRENCY,
   fetchExchangeRates,
   convertCurrency,
   formatCurrency,
+  getAllAvailableCurrencies,
 } from "@/lib/currency";
 import { toast } from "sonner";
 import { updateUserCurrency, getUserCurrency } from "@/actions/currency";
@@ -36,7 +38,7 @@ export function CurrencyProvider({ children }) {
       try {
         // Always start with localStorage for now due to database schema issue
         const savedCurrency = localStorage.getItem("preferred-currency");
-        if (savedCurrency && SUPPORTED_CURRENCIES[savedCurrency]) {
+        if (savedCurrency) {
           setCurrentCurrency(savedCurrency);
         }
 
@@ -61,7 +63,7 @@ export function CurrencyProvider({ children }) {
         console.error("Failed to load currency preference:", error);
         // Fallback to localStorage
         const savedCurrency = localStorage.getItem("preferred-currency");
-        if (savedCurrency && SUPPORTED_CURRENCIES[savedCurrency]) {
+        if (savedCurrency) {
           setCurrentCurrency(savedCurrency);
         }
       } finally {
@@ -99,7 +101,8 @@ export function CurrencyProvider({ children }) {
 
   // Change currency and save preference
   const changeCurrency = async (newCurrency) => {
-    if (!SUPPORTED_CURRENCIES[newCurrency]) {
+    const allCurrencies = getAllAvailableCurrencies(exchangeRates);
+    if (!allCurrencies[newCurrency]) {
       toast.error("Unsupported currency selected");
       return;
     }
@@ -125,7 +128,7 @@ export function CurrencyProvider({ children }) {
         }
       }
 
-      const currencyInfo = SUPPORTED_CURRENCIES[newCurrency];
+      const currencyInfo = allCurrencies[newCurrency];
       toast.success(
         `Currency changed to ${currencyInfo.name} (${currencyInfo.code})`
       );
@@ -160,7 +163,19 @@ export function CurrencyProvider({ children }) {
   };
 
   // Get current currency info
-  const getCurrencyInfo = () => SUPPORTED_CURRENCIES[currentCurrency];
+  const getCurrencyInfo = () => {
+    const allCurrencies = getAllAvailableCurrencies(exchangeRates);
+    return (
+      allCurrencies[currentCurrency] ||
+      SUPPORTED_CURRENCIES[currentCurrency] || {
+        code: currentCurrency,
+        symbol: currentCurrency,
+        name: `${currentCurrency} Currency`,
+        flag: "🌐",
+        country: "Unknown",
+      }
+    );
+  };
 
   // Get exchange rate for current currency
   const getCurrentRate = () => {
@@ -199,6 +214,8 @@ export function CurrencyProvider({ children }) {
     getCurrentRate,
     refreshRates,
     supportedCurrencies: SUPPORTED_CURRENCIES,
+    popularCurrencies: POPULAR_CURRENCIES,
+    allAvailableCurrencies: getAllAvailableCurrencies(exchangeRates),
   };
 
   return (

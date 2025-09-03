@@ -33,7 +33,8 @@ export function CurrencySelector() {
     loading,
     lastUpdated,
     changeCurrency,
-    supportedCurrencies,
+    allAvailableCurrencies,
+    popularCurrencies,
     getCurrentRate,
     refreshRates,
   } = useCurrency();
@@ -87,7 +88,7 @@ export function CurrencySelector() {
   };
 
   const filteredCurrencies = useMemo(() => {
-    const entries = Object.entries(supportedCurrencies);
+    const entries = Object.entries(allAvailableCurrencies);
     if (!searchTerm) return entries;
 
     return entries.filter(
@@ -96,7 +97,7 @@ export function CurrencySelector() {
         info.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         info.country.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [supportedCurrencies, searchTerm]);
+  }, [allAvailableCurrencies, searchTerm]);
 
   const favoriteCurrencies = useMemo(
     () => filteredCurrencies.filter(([code]) => favorites.includes(code)),

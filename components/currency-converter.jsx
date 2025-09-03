@@ -17,12 +17,20 @@ import { useCurrency } from "@/contexts/currency-context";
 import { formatCurrency } from "@/lib/currency";
 
 export function CurrencyConverter({ className = "" }) {
-  const { supportedCurrencies, exchangeRates, convertBetween } = useCurrency();
+  const {
+    allAvailableCurrencies,
+    popularCurrencies,
+    exchangeRates,
+    convertBetween,
+  } = useCurrency();
 
   const [amount, setAmount] = useState("100");
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("INR");
   const [result, setResult] = useState(null);
+  // NEW: search state for dropdowns
+  const [fromSearch, setFromSearch] = useState("");
+  const [toSearch, setToSearch] = useState("");
 
   const handleConvert = () => {
     if (!amount || !fromCurrency || !toCurrency || !exchangeRates) return;
@@ -39,6 +47,48 @@ export function CurrencyConverter({ className = "" }) {
     setToCurrency(fromCurrency);
     setResult(null);
   };
+
+  // Group currencies: popular first, then alphabetical
+  const groupedCurrencies = () => {
+    const popular = [];
+    const others = [];
+
+    Object.entries(allAvailableCurrencies).forEach(([code, info]) => {
+      if (popularCurrencies.includes(code)) {
+        popular.push([code, info]);
+      } else {
+        others.push([code, info]);
+      }
+    });
+
+    // Sort popular by the order in popularCurrencies array
+    popular.sort(
+      (a, b) =>
+        popularCurrencies.indexOf(a[0]) - popularCurrencies.indexOf(b[0])
+    );
+
+    // Sort others alphabetically
+    others.sort((a, b) => a[1].name.localeCompare(b[1].name));
+
+    return { popular, others };
+  };
+
+  const { popular: popularCurrencyList, others: otherCurrencyList } =
+    groupedCurrencies();
+
+  const filterCurrencies = (list, term) => {
+    if (!term) return list;
+    const t = term.toLowerCase();
+    return list.filter(
+      ([code, info]) =>
+        code.toLowerCase().includes(t) || info.name.toLowerCase().includes(t)
+    );
+  };
+
+  const filteredFromPopular = filterCurrencies(popularCurrencyList, fromSearch);
+  const filteredFromOthers = filterCurrencies(otherCurrencyList, fromSearch);
+  const filteredToPopular = filterCurrencies(popularCurrencyList, toSearch);
+  const filteredToOthers = filterCurrencies(otherCurrencyList, toSearch);
 
   const getCurrentRate = () => {
     if (!exchangeRates || !fromCurrency || !toCurrency) return null;
@@ -73,20 +123,58 @@ export function CurrencyConverter({ className = "" }) {
           <Label>From</Label>
           <Select value={fromCurrency} onValueChange={setFromCurrency}>
             <SelectTrigger>
-              <SelectValue />
+              <SelectValue placeholder="Select currency" />
             </SelectTrigger>
-            <SelectContent>
-              {Object.entries(supportedCurrencies).map(([code, info]) => (
-                <SelectItem key={code} value={code}>
+            <SelectContent className="max-h-80 p-0">
+              <div className="p-2 sticky top-0 bg-popover border-b z-10">
+                <Input
+                  value={fromSearch}
+                  onChange={(e) => setFromSearch(e.target.value)}
+                  placeholder="Search currency..."
+                  className="h-8 text-xs"
+                />
+              </div>
+              {filteredFromPopular.length > 0 && (
+                <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground bg-muted/30">
+                  Popular
+                </div>
+              )}
+              {filteredFromPopular.map(([code, info]) => (
+                <SelectItem key={`from-${code}`} value={code}>
                   <div className="flex items-center gap-2">
                     <span>{info.flag}</span>
                     <span>{code}</span>
-                    <span className="text-muted-foreground text-sm">
+                    <span className="text-muted-foreground text-xs truncate">
                       {info.name}
                     </span>
                   </div>
                 </SelectItem>
               ))}
+              {filteredFromOthers.length > 0 && (
+                <>
+                  <div className="h-px bg-border my-1" />
+                  <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground bg-muted/30">
+                    All ({filteredFromOthers.length})
+                  </div>
+                </>
+              )}
+              {filteredFromOthers.map(([code, info]) => (
+                <SelectItem key={`from-${code}`} value={code}>
+                  <div className="flex items-center gap-2">
+                    <span>{info.flag}</span>
+                    <span>{code}</span>
+                    <span className="text-muted-foreground text-xs truncate">
+                      {info.name}
+                    </span>
+                  </div>
+                </SelectItem>
+              ))}
+              {filteredFromPopular.length === 0 &&
+                filteredFromOthers.length === 0 && (
+                  <div className="px-3 py-4 text-center text-xs text-muted-foreground">
+                    No matches
+                  </div>
+                )}
             </SelectContent>
           </Select>
         </div>
@@ -108,20 +196,58 @@ export function CurrencyConverter({ className = "" }) {
           <Label>To</Label>
           <Select value={toCurrency} onValueChange={setToCurrency}>
             <SelectTrigger>
-              <SelectValue />
+              <SelectValue placeholder="Select currency" />
             </SelectTrigger>
-            <SelectContent>
-              {Object.entries(supportedCurrencies).map(([code, info]) => (
-                <SelectItem key={code} value={code}>
+            <SelectContent className="max-h-80 p-0">
+              <div className="p-2 sticky top-0 bg-popover border-b z-10">
+                <Input
+                  value={toSearch}
+                  onChange={(e) => setToSearch(e.target.value)}
+                  placeholder="Search currency..."
+                  className="h-8 text-xs"
+                />
+              </div>
+              {filteredToPopular.length > 0 && (
+                <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground bg-muted/30">
+                  Popular
+                </div>
+              )}
+              {filteredToPopular.map(([code, info]) => (
+                <SelectItem key={`to-${code}`} value={code}>
                   <div className="flex items-center gap-2">
                     <span>{info.flag}</span>
                     <span>{code}</span>
-                    <span className="text-muted-foreground text-sm">
+                    <span className="text-muted-foreground text-xs truncate">
                       {info.name}
                     </span>
                   </div>
                 </SelectItem>
               ))}
+              {filteredToOthers.length > 0 && (
+                <>
+                  <div className="h-px bg-border my-1" />
+                  <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground bg-muted/30">
+                    All ({filteredToOthers.length})
+                  </div>
+                </>
+              )}
+              {filteredToOthers.map(([code, info]) => (
+                <SelectItem key={`to-${code}`} value={code}>
+                  <div className="flex items-center gap-2">
+                    <span>{info.flag}</span>
+                    <span>{code}</span>
+                    <span className="text-muted-foreground text-xs truncate">
+                      {info.name}
+                    </span>
+                  </div>
+                </SelectItem>
+              ))}
+              {filteredToPopular.length === 0 &&
+                filteredToOthers.length === 0 && (
+                  <div className="px-3 py-4 text-center text-xs text-muted-foreground">
+                    No matches
+                  </div>
+                )}
             </SelectContent>
           </Select>
         </div>

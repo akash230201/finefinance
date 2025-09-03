@@ -8,10 +8,10 @@ export function FloatingButtonsProvider({ children }) {
   const [isChatbotVisible, setIsChatbotVisible] = useState(true);
 
   return (
-    <FloatingButtonsContext.Provider 
-      value={{ 
-        isChatbotVisible, 
-        setIsChatbotVisible 
+    <FloatingButtonsContext.Provider
+      value={{
+        isChatbotVisible,
+        setIsChatbotVisible,
       }}
     >
       {children}
@@ -22,7 +22,9 @@ export function FloatingButtonsProvider({ children }) {
 export function useFloatingButtons() {
   const context = useContext(FloatingButtonsContext);
   if (!context) {
-    throw new Error("useFloatingButtons must be used within a FloatingButtonsProvider");
+    throw new Error(
+      "useFloatingButtons must be used within a FloatingButtonsProvider"
+    );
   }
   return context;
 }
