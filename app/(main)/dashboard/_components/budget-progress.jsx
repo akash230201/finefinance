@@ -13,6 +13,7 @@ import {
 import { CurrencyDisplay } from "@/components/currency-display";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { useCurrency } from "@/contexts/currency-context";
 import useFetch from "@/hooks/use-fetch";
 import { Check, Pencil, X } from "lucide-react";
 import React, { useEffect } from "react";
@@ -23,6 +24,7 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
   const [newBudget, setNewBudget] = React.useState(
     initialBudget?.amount?.toString() || ""
   );
+  const { convertToUSD, currentCurrency, currencyInfo } = useCurrency();
 
   // Calculate percentage with proper error handling and bounds checking
   const percentageUsed = React.useMemo(() => {
@@ -44,19 +46,22 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
   } = useFetch(updateBudget);
 
   const handleUpdateBudget = async () => {
-    const amount = parseFloat(newBudget);
-    if (isNaN(amount) || amount <= 0) {
+    const budgetInSelectedCurrency = parseFloat(newBudget);
+    if (isNaN(budgetInSelectedCurrency) || budgetInSelectedCurrency <= 0) {
       toast.error("Please enter a valid budget amount.");
       return;
     }
 
-    // Pass amount as a direct parameter, not in an object, to match server action
-    await updateBudgetFn(amount);
+    // Convert budget amount from selected currency to USD for database storage
+    const budgetInUSD = convertToUSD(budgetInSelectedCurrency);
+
+    // Pass the USD amount to the server action
+    await updateBudgetFn(budgetInUSD);
   };
 
   useEffect(() => {
     if (updatedBudget) {
-        if (updatedBudget.success) {
+      if (updatedBudget.success) {
         setIsEnding(false);
         toast.success("Budget updated successfully.");
       } else if (updatedBudget.error) {
@@ -91,7 +96,7 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
                     value={newBudget}
                     onChange={(e) => setNewBudget(e.target.value)}
                     className="w-32"
-                    placeholder="Enter Amount"
+                    placeholder={`0.00 ${currentCurrency}`}
                     autoFocus
                     disabled={isLoading}
                   />
@@ -114,12 +119,15 @@ const BudgetProgress = ({ initialBudget, currentExpenses }) => {
                 </div>
                 {newBudget && parseFloat(newBudget) > 0 && (
                   <div className="text-xs text-muted-foreground">
-                    Budget:{" "}
-                    <CurrencyDisplay
-                      amount={parseFloat(newBudget)}
-                      showCode={true}
-                    />{" "}
-                    (stored as USD)
+                    Budget: {currencyInfo?.symbol || currentCurrency}
+                    {parseFloat(newBudget).toFixed(2)} {currentCurrency}
+                    {currentCurrency !== "USD" && (
+                      <span>
+                        {" "}
+                        → ${convertToUSD(parseFloat(newBudget)).toFixed(2)} USD
+                        (stored)
+                      </span>
+                    )}
                   </div>
                 )}
               </div>
