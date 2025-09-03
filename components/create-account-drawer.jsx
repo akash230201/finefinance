@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import useFetch from "@/hooks/use-fetch";
 import { toast } from "sonner";
+import { useCurrency } from "@/contexts/currency-context";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +31,8 @@ import { accountSchema } from "@/app/lib/schema";
 
 export function CreateAccountDrawer({ children }) {
   const [open, setOpen] = useState(false);
+  const { convertToUSD, currentCurrency, currencyInfo, formatAmount } =
+    useCurrency();
   const {
     register,
     handleSubmit,
@@ -55,7 +58,22 @@ export function CreateAccountDrawer({ children }) {
   } = useFetch(createAccount);
 
   const onSubmit = async (data) => {
-    await createAccountFn(data);
+    // Convert the balance from selected currency to USD for database storage
+    const balanceInSelectedCurrency = parseFloat(data.balance);
+    if (isNaN(balanceInSelectedCurrency)) {
+      toast.error("Please enter a valid balance amount");
+      return;
+    }
+
+    // Convert to USD before saving to database
+    const balanceInUSD = convertToUSD(balanceInSelectedCurrency);
+
+    const accountData = {
+      ...data,
+      balance: balanceInUSD.toString(), // Convert back to string for form handling
+    };
+
+    await createAccountFn(accountData);
   };
 
   useEffect(() => {
@@ -135,7 +153,7 @@ export function CreateAccountDrawer({ children }) {
                 htmlFor="balance"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 tracking-tight"
               >
-                Initial Balance
+                Initial Balance ({currencyInfo?.symbol || currentCurrency})
               </label>
               <Input
                 id="balance"
@@ -145,6 +163,12 @@ export function CreateAccountDrawer({ children }) {
                 className="h-11 border border-border/60 shadow-sm hover:shadow-md hover:border-border/80 transition-all duration-200 bg-background/50"
                 {...register("balance")}
               />
+              {currentCurrency !== "USD" && (
+                <p className="text-xs text-muted-foreground">
+                  Amount will be converted from {currentCurrency} to USD and
+                  stored in the database.
+                </p>
+              )}
               {errors.balance && (
                 <p className="text-sm text-destructive font-medium">
                   {errors.balance.message}
