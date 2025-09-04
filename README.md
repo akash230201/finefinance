@@ -16,19 +16,6 @@
   <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
----
-
-## 📸 Screenshots (Dark & Light)
-
-> Add real screenshots (dashboard, currency center, converter, email) here.
-
-```
-/assets/screenshots/dashboard-dark.png
-/assets/screenshots/dashboard-light.png
-/assets/screenshots/currency-center.png
-```
-
----
 
 ## ✨ Key Features
 
