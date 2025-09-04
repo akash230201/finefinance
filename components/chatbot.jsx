@@ -210,14 +210,15 @@ export function Chatbot() {
       {/* Floating Chat Button */}
       <Button
         onClick={toggleChat}
+        aria-label={isOpen ? "Close chat" : "Open chat"}
         className={cn(
           "fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg transition-all duration-300 z-50",
           "bg-gradient-to-br from-primary to-secondary",
           "hover:shadow-xl hover:scale-105",
           "border border-primary/20",
-          // Show only on mobile (hidden on md and up)
-          "md:hidden",
-          // Visibility based on scroll behavior
+          // Removed md:hidden so it also shows on desktop
+          // Add slightly larger offset on very large screens
+          "lg:bottom-8 lg:right-8",
           isVisible
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-4 pointer-events-none"
